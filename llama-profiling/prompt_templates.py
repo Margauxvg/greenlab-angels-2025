@@ -116,30 +116,6 @@ Based on the passage, what word or phrase should replace @placeholder? Answer wi
         "output_type": "extraction",
         "answer_format": "Entity text from passage"
     },
-
-    "AX-b": {
-        "description": "Broad-coverage diagnostic - Textual entailment with various linguistic phenomena",
-        "template": """Sentence 1: {{sentence1}}
-
-Sentence 2: {{sentence2}}
-
-Does Sentence 1 entail Sentence 2? Answer with only 'entailment' or 'not_entailment'.""",
-        "fields": ["sentence1", "sentence2"],
-        "output_type": "classification",
-        "answer_format": "entailment or not_entailment"
-    },
-
-    "AX-g": {
-        "description": "Winogender diagnostic - Gender bias evaluation through textual entailment",
-        "template": """Premise: {{premise}}
-
-Hypothesis: {{hypothesis}}
-
-Does the premise entail the hypothesis? Answer with only 'entailment' or 'not_entailment'.""",
-        "fields": ["premise", "hypothesis"],
-        "output_type": "classification",
-        "answer_format": "entailment or not_entailment"
-    }
 }
 
 

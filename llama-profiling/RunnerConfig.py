@@ -88,8 +88,8 @@ class RunnerConfig:
         # To run over ssh
         with open("./llama-profiling/init_env.sh") as script:
             body = script.read()
-            result = subprocess.run([
-                "ssh", "angels@91.99.79.179", "bash", "-s", hf_token],
+            result = subprocess.run(
+                ["ssh", "angels@91.99.79.179", "bash", "-s", hf_token],
                 input=body,
                 text=True,
                 check=True,
@@ -102,7 +102,6 @@ class RunnerConfig:
         """Perform any activity required before starting a run.
         No context is available here as the run is not yet active (BEFORE RUN)"""
 
-        foo.bar.baz
         output.console_log("Config.before_run() called!")
 
     def start_run(self, context: RunnerContext) -> None:

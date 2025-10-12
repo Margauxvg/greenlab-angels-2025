@@ -8,8 +8,6 @@ fi
 
 HF_TOKEN=$1
 
-pwd
-
 cd storage
 
 # download the repo
@@ -69,4 +67,18 @@ if [ ! -d "llama-profiling/models/3.2-3B" ]; then
     hf download meta-llama/Llama-3.2-3B-Instruct --local-dir llama-profiling/models/3.2-3B
 else
     echo "Model already exists at llama-profiling/models/3.2-3B. Skipping download."
+fi
+
+if [ ! -d "llama-profiling/models/4-scout-17B" ]; then
+    echo "Model not found locally. Downloading..."
+    hf download meta-llama/Llama-4-Scout-17B-16E-Instruct --local-dir llama-profiling/models/4-scout-17B
+else
+    echo "Model already exists at llama-profiling/models/4-scout-17B. Skipping download."
+fi
+
+if [ ! -d "llama-profiling/models/4-maverick-17B" ]; then
+    echo "Model not found locally. Downloading..."
+    hf download meta-llama/Llama-4-Maverick-17B-128E-Instruct --local-dir llama-profiling/models/4-maverick-17B
+else
+    echo "Model already exists at llama-profiling/models/4-maverick-17B. Skipping download."
 fi

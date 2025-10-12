@@ -84,6 +84,9 @@ class RunnerConfig:
         """Perform any activity required before starting the experiment here
         Invoked only once during the lifetime of the program."""
 
+        # To run over ssh
+        # result = subprocess.run(["ssh user@remote-server 'bash -s' < llama-profiling/init_env.sh"], check=True)
+
         result = subprocess.run(['llama-profiling/init_env.sh'], check=True)
 
     def before_run(self) -> None:

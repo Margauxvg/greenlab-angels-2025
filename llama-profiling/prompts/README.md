@@ -20,13 +20,13 @@ Each line contains a JSON object with the following structure:
 
 ### Fields
 
-| Field | Description |
-|-------|-------------|
-| `task_type` | The SuperGLUE task name (e.g., "BoolQ", "COPA") |
-| `idx` | Sample index from the original dataset |
-| `prompt` | The formatted prompt text ready to send to an LLM |
-| `label` | Ground truth answer for evaluation |
-| `original_data` | The original data sample with all fields |
+| Field           | Description                                       |
+| --------------- | ------------------------------------------------- |
+| `task_type`     | The SuperGLUE task name (e.g., "BoolQ", "COPA")   |
+| `idx`           | Sample index from the original dataset            |
+| `prompt`        | The formatted prompt text ready to send to an LLM |
+| `label`         | Ground truth answer for evaluation                |
+| `original_data` | The original data sample with all fields          |
 
 ### Special Cases
 
@@ -35,18 +35,16 @@ Each line contains a JSON object with the following structure:
 
 ## Files
 
-| File | Prompts | Description |
-|------|---------|-------------|
-| `BoolQ.jsonl` | 100 | Boolean questions based on passages |
-| `COPA.jsonl` | 100 | Choice of plausible alternatives (cause/effect) |
-| `CB.jsonl` | 100 | Textual entailment (3-way classification) |
-| `RTE.jsonl` | 100 | Textual entailment (2-way classification) |
-| `WiC.jsonl` | 100 | Word sense disambiguation |
-| `WSC.jsonl` | 100 | Pronoun coreference resolution |
-| `MultiRC.jsonl` | 5,985 | Multi-sentence reading comprehension |
-| `ReCoRD.jsonl` | 154 | Cloze-style reading comprehension |
-| `AX-b.jsonl` | 100 | Broad-coverage linguistic diagnostics |
-| `AX-g.jsonl` | 100 | Gender bias diagnostics |
+| File            | Prompts | Description                                     |
+| --------------- | ------- | ----------------------------------------------- |
+| `BoolQ.jsonl`   | 100     | Boolean questions based on passages             |
+| `COPA.jsonl`    | 100     | Choice of plausible alternatives (cause/effect) |
+| `CB.jsonl`      | 100     | Textual entailment (3-way classification)       |
+| `RTE.jsonl`     | 100     | Textual entailment (2-way classification)       |
+| `WiC.jsonl`     | 100     | Word sense disambiguation                       |
+| `WSC.jsonl`     | 100     | Pronoun coreference resolution                  |
+| `MultiRC.jsonl` | 5,985   | Multi-sentence reading comprehension            |
+| `ReCoRD.jsonl`  | 154     | Cloze-style reading comprehension               |
 
 **Total: 6,939 prompts**
 
@@ -81,18 +79,16 @@ with open('prompts/BoolQ.jsonl', 'r') as f:
 
 ### Answer Formats by Task
 
-| Task | Expected Answer Format |
-|------|----------------------|
-| BoolQ | "True" or "False" |
-| COPA | "1" or "2" |
-| CB | "entailment", "contradiction", or "neutral" |
-| RTE | "entailment" or "not_entailment" |
-| WiC | "True" or "False" |
-| WSC | "True" or "False" |
-| MultiRC | "True" or "False" |
-| ReCoRD | Entity text from passage |
-| AX-b | "entailment" or "not_entailment" |
-| AX-g | "entailment" or "not_entailment" |
+| Task    | Expected Answer Format                      |
+| ------- | ------------------------------------------- |
+| BoolQ   | "True" or "False"                           |
+| COPA    | "1" or "2"                                  |
+| CB      | "entailment", "contradiction", or "neutral" |
+| RTE     | "entailment" or "not_entailment"            |
+| WiC     | "True" or "False"                           |
+| WSC     | "True" or "False"                           |
+| MultiRC | "True" or "False"                           |
+| ReCoRD  | Entity text from passage                    |
 
 ## Regeneration
 

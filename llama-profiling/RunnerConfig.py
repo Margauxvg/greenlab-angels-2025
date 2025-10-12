@@ -17,6 +17,7 @@ import signal
 import requests
 import time
 import csv
+import os
 
 class RunnerConfig:
     ROOT_DIR = Path(dirname(realpath(__file__)))
@@ -65,7 +66,6 @@ class RunnerConfig:
         tasks = FactorModel("task", ["BoolQ", "CB", "COPA", "MultiRC", "ReCoRD", "RTE", "WiC", "WSC"])
         self.run_table_model = RunTableModel(
             factors=[generation, model_size, tasks],
-            repetitions=30,
             shuffle=True,
             exclude_combinations=[
                 {generation: ['1'], model_size: ['1B', '3B', '8B', '11B', '17B']}, # only run 6.7B and 13B
@@ -84,10 +84,19 @@ class RunnerConfig:
         """Perform any activity required before starting the experiment here
         Invoked only once during the lifetime of the program."""
 
+        hf_token = os.getenv("HF_TOKEN")
         # To run over ssh
-        # result = subprocess.run(["ssh user@remote-server 'bash -s' < llama-profiling/init_env.sh"], check=True)
+        with open("./llama-profiling/init_env.sh") as script:
+            body = script.read()
+            result = subprocess.run(
+                ["ssh", "angels@91.99.79.179", "bash", "-s", hf_token],
+                input=body,
+                text=True,
+                check=True,
+            )
 
-        result = subprocess.run(['llama-profiling/init_env.sh'], check=True)
+        # Testing locally:
+        # result = subprocess.run(['./llama-profiling/init_env.sh', hf_token], check=True)
 
     def before_run(self) -> None:
         """Perform any activity required before starting a run.

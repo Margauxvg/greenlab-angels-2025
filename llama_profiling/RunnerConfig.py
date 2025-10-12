@@ -86,7 +86,7 @@ class RunnerConfig:
 
         hf_token = os.getenv("HF_TOKEN")
         # To run over ssh
-        with open("./llama_profiling/bin/init_env.sh") as script:
+        with open("./llama-profiling/bin/init_env.sh") as script:
             body = script.read()
             result = subprocess.run(
                 ["ssh", "angels@91.99.79.179", "bash", "-s", hf_token],
@@ -96,7 +96,7 @@ class RunnerConfig:
             )
 
         # Testing locally:
-        # result = subprocess.run(['./llama_profiling/bin/init_env.sh', hf_token], check=True)
+        # result = subprocess.run(['./llama-profiling/bin/init_env.sh', hf_token], check=True)
 
     def before_run(self) -> None:
         """Perform any activity required before starting a run.
@@ -117,7 +117,7 @@ class RunnerConfig:
         generation = context.execute_run["generation"]
         parameters = context.execute_run["model_size"]
 
-        self.profiler = EnergiBridge(target_program=f"python llama_profiling/bin/run_model.py {generation} {parameters}",
+        self.profiler = EnergiBridge(target_program=f"python llama-profiling/bin/run_model.py {generation} {parameters}",
                                      out_file=context.run_dir / "energibridge.csv")
 
         self.profiler.start()
@@ -125,17 +125,8 @@ class RunnerConfig:
     def interact(self, context: RunnerContext) -> None:
         """Perform any interaction with the running target system here, or block here until the target finishes."""
         # The server isn't immediately online, this polls until it is successful
-        self.wait_for_server()
-
-        inputs = self.read_tsv("./llama_profiling/glue_data/CoLA/test.tsv")
-        for e in inputs:
-            start_time = time.time() * 1000  # Convert to milliseconds
-            out = self.run_prompt(e["sentence"])
-            end_time = time.time() * 1000  # Convert to milliseconds
-            duration_ms = end_time - start_time
-            output.console_log(f"Prompt execution took {duration_ms:.2f} ms")
-            output.console_log(out)
-
+        srv = APIServer(Router)
+        srv.listen()
 
     def run_prompt(self, prompt_text: str):
         # get the current unix timestamp
@@ -189,7 +180,7 @@ class RunnerConfig:
         Invoked only once during the lifetime of the program."""
 
         output.console_log("Config.after_experiment() called!")
-        # shutil.rmtree("llama_profiling/experiments")
+        # shutil.rmtree("llama-profiling/experiments")
 
     def wait_for_server(self) -> None:
         max_attempts = 12  # 12 attempts * 5 seconds = 60 seconds

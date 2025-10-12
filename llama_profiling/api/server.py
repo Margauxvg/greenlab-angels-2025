@@ -32,9 +32,9 @@ class Router(BaseHTTPRequestHandler):
 class APIServer:
     port: int = 9999
 
-    def __init__(self):
+    def __init__(self, router):
         server_address = ('', self.port)
-        self.httpd = HTTPServer(server_address, Router)
+        self.httpd = HTTPServer(server_address, router)
 
         signal.signal(signal.SIGTERM, self.signal_handler)
         signal.signal(signal.SIGINT, self.signal_handler)

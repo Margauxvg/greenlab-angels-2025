@@ -144,7 +144,6 @@ class RunnerConfig:
         self.httpd = HTTPServer(server_address, HttpHandler)
         print(f"Server running on http://localhost:{port}")
         print("Send POST requests to /run-finished")
-        self.httpd.serve_forever()
 
     def interact(self, context: RunnerContext) -> None:
         """Perform any interaction with the running target system here, or block here until the target finishes."""
@@ -166,6 +165,7 @@ class RunnerConfig:
             # Waiting for run to complete
             while not self.httpd.webhook_called:
                 time.sleep(10)
+                self.httpd.handle_request()
             self.httpd.webhook_called = False
 
 

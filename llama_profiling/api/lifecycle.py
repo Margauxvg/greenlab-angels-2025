@@ -18,10 +18,10 @@ class LifecycleController:
 
     def start(self, body):
         model = body["model"]
-        cb_url = body["callback_url"]
+        self.cb_url = body["callback_url"]
         dataset = body["dataset"]
 
-        self.profiler = EnergiBridge(target_program=f"python llama_profiling/bin/model_runner.py {model} {dataset} {cb_url}",
+        self.profiler = EnergiBridge(target_program=f"python llama_profiling/bin/model_runner.py {model} {dataset} {self.cb_url}",
                                      out_file=Path("energibridge.csv"))
 
         self.profiler.start()
@@ -44,7 +44,7 @@ class LifecycleController:
             'energibridge.csv': Path('energibridge.csv').read_text(),
             'energibridge-summary.txt': Path('energibridge-summary.txt').read_text()
         }
-        callback_url = "experiment-runner-server"
+        callback_url = self.cb_url
 
         for attempt in range(max_retries):
             try:

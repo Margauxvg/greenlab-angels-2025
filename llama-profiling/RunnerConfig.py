@@ -166,6 +166,7 @@ class RunnerConfig:
             while not self.httpd.webhook_called:
                 time.sleep(10)
                 self.httpd.handle_request()
+            print("Webhook has been called, progressing to next run")
             self.httpd.webhook_called = False
 
 

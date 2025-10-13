@@ -23,16 +23,13 @@ import os
 
 
 class HttpHandler(BaseHTTPRequestHandler):
-    def __init__(self):
-        self.webhook_called = False
-
     def do_POST(self):
         if self.path == '/run-finished':
             self.send_response(200)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write("success".encode('utf-8'))
-            self.webhook_called = True
+            self.server.webhook_received = True
 
 class RunnerConfig:
     ROOT_DIR = Path(dirname(realpath(__file__)))
@@ -142,6 +139,7 @@ class RunnerConfig:
     def start_server(self, port=4448):
         server_address = ('', port)
         self.httpd = HTTPServer(server_address, HttpHandler)
+        self.httpd.webhook_received = False
         print(f"Server running on http://localhost:{port}")
         print("Send POST requests to /run-finished")
 
@@ -151,7 +149,7 @@ class RunnerConfig:
         self.wait_for_server()
 
         inputs = self.read_tsv("./llama-profiling/glue_data/CoLA/test.tsv")
-        for e in inputs:
+        for i,e in enumerate(inputs):
             #start_time = time.time() * 1000  # Convert to milliseconds
             #out = self.run_prompt(e["sentence"])
             #end_time = time.time() * 1000  # Convert to milliseconds
@@ -163,11 +161,11 @@ class RunnerConfig:
             # call greenlab server endpoint
 
             # Waiting for run to complete
-            while not self.httpd.webhook_called:
-                time.sleep(10)
+            print("Starting run ", i)
+            while not self.httpd.webhook_received:
                 self.httpd.handle_request()
             print("Webhook has been called, progressing to next run")
-            self.httpd.webhook_called = False
+            self.httpd.webhook_received = False
 
 
     def run_prompt(self, prompt_text: str):

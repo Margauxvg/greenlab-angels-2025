@@ -24,10 +24,7 @@ class ModelRunner:
                 self.log(f"running prompt {i + 1} out of {len(self.dataset)}")
                 self.run_prompt(prompt)
 
-                if i == 50:
-                    break
-
-            self.write_outputs_to_tsv("./foobar.tsv")
+            self.write_outputs_to_tsv("./prompt_outs.tsv")
             self.send_callback()
         except Exception as e:
             with open("errors.txt", "w") as f:
@@ -99,7 +96,13 @@ class ModelRunner:
             print(f"Error: Model path does not exist: {model_path}")
             sys.exit(1)
 
-        self.model = LLM(model=model_path, max_model_len=4096, max_num_batched_tokens=4096)
+        self.model = LLM(
+            model=model_path,
+            max_model_len=2048,
+            max_num_batched_tokens=2048,
+            enforce_eager=True,
+            gpu_memory_utilization=0.85
+        )
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
 
     def init_dataset(self, dataset):

@@ -48,7 +48,7 @@ class LifecycleController:
 
         for attempt in range(max_retries):
             try:
-                response = requests.post(callback_url, timeout=10, json={"files": payload})
+                response = requests.post(self.cb_url, timeout=10, json={"files": payload})
                 response.raise_for_status()
                 print(f"Callback sent successfully to {callback_url}")
                 return

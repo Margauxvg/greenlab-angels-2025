@@ -22,9 +22,11 @@ class ModelRunner:
 
     def run_prompt(self, prompt):
         messages = [{"role": "user", "content": prompt}]
-        formatted_prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        formatted_prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         sampling_params = SamplingParams(temperature=0.7, top_p=0.9)
-        outputs = model.generate([formatted_prompt], sampling_params)
+        outputs = self.model.generate([formatted_prompt], sampling_params)
+
+        print(outputs[0].outputs[0].text)
 
     def send_callback(self, max_retries=5, initial_delay=1):
         delay = initial_delay

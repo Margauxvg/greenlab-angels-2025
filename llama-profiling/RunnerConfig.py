@@ -1,3 +1,5 @@
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
 from EventManager.Models.RunnerEvents import RunnerEvents
 from EventManager.EventSubscriptionController import EventSubscriptionController
 from ConfigValidator.Config.Models.RunTableModel import RunTableModel
@@ -18,6 +20,16 @@ import requests
 import time
 import csv
 import os
+
+
+class HttpHandler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        if self.path == '/run-finished':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write("success".encode('utf-8'))
+            self.server.webhook_received = True
 
 class RunnerConfig:
     ROOT_DIR = Path(dirname(realpath(__file__)))
@@ -120,7 +132,16 @@ class RunnerConfig:
         self.profiler = EnergiBridge(target_program=f"python llama-profiling/run_model.py {generation} {parameters}",
                                      out_file=context.run_dir / "energibridge.csv")
 
+        self.start_server(4448)
         self.profiler.start()
+
+
+    def start_server(self, port=4448):
+        server_address = ('', port)
+        self.httpd = HTTPServer(server_address, HttpHandler)
+        self.httpd.webhook_received = False
+        print(f"Server running on http://localhost:{port}")
+        print("Send POST requests to /run-finished")
 
     def interact(self, context: RunnerContext) -> None:
         """Perform any interaction with the running target system here, or block here until the target finishes."""
@@ -128,13 +149,23 @@ class RunnerConfig:
         self.wait_for_server()
 
         inputs = self.read_tsv("./llama-profiling/glue_data/CoLA/test.tsv")
-        for e in inputs:
-            start_time = time.time() * 1000  # Convert to milliseconds
-            out = self.run_prompt(e["sentence"])
-            end_time = time.time() * 1000  # Convert to milliseconds
-            duration_ms = end_time - start_time
-            output.console_log(f"Prompt execution took {duration_ms:.2f} ms")
-            output.console_log(out)
+        for i,e in enumerate(inputs):
+            #start_time = time.time() * 1000  # Convert to milliseconds
+            #out = self.run_prompt(e["sentence"])
+            #end_time = time.time() * 1000  # Convert to milliseconds
+            #duration_ms = end_time - start_time
+            #output.console_log(f"Prompt execution took {duration_ms:.2f} ms")
+            #output.console_log(out)
+
+            # Perform next run
+            # call greenlab server endpoint
+
+            # Waiting for run to complete
+            print("Starting run ", i)
+            while not self.httpd.webhook_received:
+                self.httpd.handle_request()
+            print("Webhook has been called, progressing to next run")
+            self.httpd.webhook_received = False
 
 
     def run_prompt(self, prompt_text: str):

@@ -79,7 +79,7 @@ class ModelRunner:
     def send_callback(self, max_retries=5, initial_delay=1):
         delay = initial_delay
         payload = {
-            'foobar.tsv': Path('foobar.tsv').read_text(),
+            'prompts_out.tsv': Path('prompts_out.tsv').read_text(),
             'energibridge.csv': Path('energibridge.csv').read_text(),
             'energibridge-summary.txt': Path('energibridge-summary.txt').read_text()
         }

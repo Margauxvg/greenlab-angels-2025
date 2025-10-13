@@ -224,8 +224,11 @@ class RunnerConfig:
 
         eb_log, eb_summary = self.profiler.parse_log(self.profiler.logfile, 
                                                      self.profiler.summary_logfile)
+        shutil.copyfile(self.profiler.logfile, context.run_dir+'/'+self.profiler.logfile)
+        shutil.copyfile(self.profiler.summary_logfile, context.run_dir+'/'+self.profiler.summary_logfile)
+        shutil.copyfile('prompts_out.tsv', context.run_dir+'/prompts_out.tsv')
 
-        return {"energy": 0}
+        return {"energy": eb_summary.total_joules}
 
     def after_experiment(self) -> None:
         """Perform any activity required after stopping the experiment here

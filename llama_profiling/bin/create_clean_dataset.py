@@ -14,8 +14,8 @@ import json
 import shutil
 
 # Define paths
-data_dir = "data"
-clean_dir = "clean_data"
+data_dir = "llama_profiling/data"
+clean_dir = "llama_profiling/clean_data"
 
 # Get all task type directories (excluding hidden files)
 task_types = [d for d in os.listdir(data_dir)
@@ -46,11 +46,11 @@ for task_type in task_types:
         print(f"  Warning: No JSONL file found for {task_type}, skipping...")
         continue
 
-    # Read and select first 100 samples
+    # Read and select first 80 samples
     samples = []
     with open(source_file, 'r', encoding='utf-8') as f:
         for i, line in enumerate(f):
-            if i >= 100:
+            if i >= 80:
                 break
             samples.append(line.strip())
 

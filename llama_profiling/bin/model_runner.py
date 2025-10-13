@@ -5,6 +5,7 @@ import json
 import time
 from vllm import LLM, SamplingParams
 from transformers import AutoTokenizer
+from pathlib import Path
 import requests
 
 class ModelRunner:
@@ -77,10 +78,15 @@ class ModelRunner:
 
     def send_callback(self, max_retries=5, initial_delay=1):
         delay = initial_delay
+        payload = {
+            'foobar.tsv': Path('foobar.tsv').read_text(),
+            'energibridge.csv': Path('energibridge.csv').read_text(),
+            'energibridge-summary.txt': Path('energibridge-summary.txt').read_text()
+        }
 
         for attempt in range(max_retries):
             try:
-                response = requests.post(self.callback_url, timeout=10)
+                response = requests.post(self.callback_url, timeout=10, json={"files": payload})
                 response.raise_for_status()
                 print(f"Callback sent successfully to {self.callback_url}")
                 return

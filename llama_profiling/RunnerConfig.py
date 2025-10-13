@@ -1,3 +1,4 @@
+import json
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 from EventManager.Models.RunnerEvents import RunnerEvents
@@ -25,10 +26,36 @@ import os
 class HttpHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         if self.path == '/run-finished':
+            print('Webhook invoked, saving files...')
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+
+            try:
+                body = json.loads(post_data)
+            except json.JSONDecodeError:
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b"Invalid JSON")
+                return
+
+            files = body.get("files")
+            if not isinstance(files, dict):
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b"'files' must be a JSON object")
+                return
+
+            # Write each key/value pair to a file
+            for filename, content in files.items():
+                with open(filename, "w", encoding="utf-8") as f:
+                    f.write(content)
+                    print('Saved ', filename)
+
             self.send_response(200)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write("success".encode('utf-8'))
+            print('Webhook successful')
             self.server.webhook_received = True
 
 class RunnerConfig:

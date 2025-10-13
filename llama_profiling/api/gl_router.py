@@ -10,6 +10,9 @@ class GLRouter(BaseHTTPRequestHandler):
         if self.path == '/start':
             self.lc.start(self.get_body())
             self.default_headers()
+        elif self.path == '/stop':
+            self.lc.stop()
+            self.default_headers()
         else:
             self.not_found()
 

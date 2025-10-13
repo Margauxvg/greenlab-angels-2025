@@ -13,20 +13,67 @@ class ModelRunner:
         self.init_dataset(dataset)
 
         self.callback_url = callback_url
+        self.outputs = []
+
+        self.log_file = open("logs.txt", "w")
 
     def measure(self):
-        for prompt in self.dataset:
-            self.run_prompt(prompt)
+        try:
+            self.log(f"sending {len(self.dataset)} prompts")
+            for i, prompt in enumerate(self.dataset):
+                self.log(f"running prompt {i + 1} out of {len(self.dataset)}")
+                self.run_prompt(prompt)
 
-        self.send_callback()
+                if i == 50:
+                    break
+
+            self.write_outputs_to_tsv("./foobar.tsv")
+            self.send_callback()
+        except Exception as e:
+            with open("errors.txt", "w") as f:
+                print(f"Error: {e}", file=f)
+
+            self.send_callback()
+        finally:
+            self.log_file.close()
+
+    def log(self, log):
+        print(log, file=self.log_file)
+        self.log_file.flush()
 
     def run_prompt(self, prompt):
         messages = [{"role": "user", "content": prompt}]
+
+        start = int(time.time())
         formatted_prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         sampling_params = SamplingParams(temperature=0.7, top_p=0.9)
         outputs = self.model.generate([formatted_prompt], sampling_params)
+        end = int(time.time())
+        resp = outputs[0].outputs[0].text
 
-        print(outputs[0].outputs[0].text)
+        self.add_output(start, end, prompt, resp)
+
+    def add_output(self, start, end, prompt, response):
+        self.outputs.append({
+            "start": start,
+            "end": end,
+            "prompt": prompt,
+            "response": response
+        })
+
+    def write_outputs_to_tsv(self, filename):
+        with open(filename, 'w') as f:
+            f.write("start\tend\tprompt\tresponse\n")
+
+            # Write each output as a row
+            for output in self.outputs:
+                start = str(output['start'])
+                end = str(output['end'])
+                prompt = output['prompt'].replace('\t', ' ').replace('\n', ' ')
+                response = output['response'].replace('\t', ' ').replace('\n', ' ')
+                f.write(f"{start}\t{end}\t{prompt}\t{response}\n")
+
+        print(f"Wrote {len(self.outputs)} outputs to {filename}")
 
     def send_callback(self, max_retries=5, initial_delay=1):
         delay = initial_delay

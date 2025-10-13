@@ -167,21 +167,6 @@ class RunnerConfig:
             print("Webhook has been called, progressing to next run")
             self.httpd.webhook_received = False
 
-
-    def run_prompt(self, prompt_text: str):
-        # get the current unix timestamp
-        response = requests.post("http://localhost:9999/prompt", data=prompt_text)
-        return response.text
-
-    def read_tsv(self, file_path: str) -> List[Dict[str, str]]:
-        """Read a TSV file and return the data as a list of dictionaries."""
-        data = []
-        with open(file_path, 'r', encoding='utf-8') as file:
-            reader = csv.DictReader(file, delimiter='\t')
-            for row in reader:
-                data.append(dict(row))
-        return data
-
     def stop_measurement(self, context: RunnerContext) -> None:
         """Perform any activity here required for stopping measurements."""
 

@@ -78,15 +78,10 @@ class ModelRunner:
 
     def send_callback(self, max_retries=5, initial_delay=1):
         delay = initial_delay
-        payload = {
-            'prompts_out.tsv': Path('prompts_out.tsv').read_text(),
-            'energibridge.csv': Path('energibridge.csv').read_text(),
-            'energibridge-summary.txt': Path('energibridge-summary.txt').read_text()
-        }
 
         for attempt in range(max_retries):
             try:
-                response = requests.post(self.callback_url, timeout=10, json={"files": payload})
+                response = requests.post(self.callback_url, timeout=10)
                 response.raise_for_status()
                 print(f"Callback sent successfully to {self.callback_url}")
                 return

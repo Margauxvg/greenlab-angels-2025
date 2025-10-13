@@ -12,7 +12,6 @@ class APIServer:
         signal.signal(signal.SIGTERM, self.signal_handler)
         signal.signal(signal.SIGINT, self.signal_handler)
 
-
     def listen(self):
         print(f"Server running on http://localhost:{self.port}")
         self.httpd.serve_forever()

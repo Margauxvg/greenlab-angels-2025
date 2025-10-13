@@ -95,7 +95,7 @@ with open('prompts/BoolQ.jsonl', 'r') as f:
 To regenerate all prompt files:
 
 ```bash
-python3 generate_prompts.py
+python3 bin/generate_prompts.py
 ```
 
 This will recreate the entire `prompts/` directory from the `clean_data/` samples.

@@ -4,7 +4,7 @@ Script to create a clean dataset with 100 samples from each task type.
 
 TODO::CITE CLAUDE
 
-could you please look at the data directory in llama-profiling.\
+could you please look at the data directory in llama_profiling.\
 \
 Your task is to create a new "clean_data" directory, and go over each task type in the data directory and select 100 samples from each task type, and 
 put it into the new clean directory

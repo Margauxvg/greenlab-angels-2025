@@ -98,7 +98,7 @@ class RunnerConfig:
 
         hf_token = os.getenv("HF_TOKEN")
         # To run over ssh
-        with open("./llama-profiling/init_env.sh") as script:
+        with open("./llama-profiling/bin/init_env.sh") as script:
             body = script.read()
             result = subprocess.run(
                 ["ssh", "angels@91.99.79.179", "bash", "-s", hf_token],
@@ -108,7 +108,7 @@ class RunnerConfig:
             )
 
         # Testing locally:
-        # result = subprocess.run(['./llama-profiling/init_env.sh', hf_token], check=True)
+        # result = subprocess.run(['./llama-profiling/bin/init_env.sh', hf_token], check=True)
 
     def before_run(self) -> None:
         """Perform any activity required before starting a run.
@@ -129,7 +129,7 @@ class RunnerConfig:
         generation = context.execute_run["generation"]
         parameters = context.execute_run["model_size"]
 
-        self.profiler = EnergiBridge(target_program=f"python llama-profiling/run_model.py {generation} {parameters}",
+        self.profiler = EnergiBridge(target_program=f"python llama-profiling/bin/run_model.py {generation} {parameters}",
                                      out_file=context.run_dir / "energibridge.csv")
 
         self.start_server(4448)

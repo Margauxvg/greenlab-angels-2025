@@ -24,7 +24,7 @@ def generate_prompts_for_task(task_type, output_dir="prompts"):
     Returns:
         int: Number of prompts generated
     """
-    input_file = f"clean_data/{task_type}/data.jsonl"
+    input_file = f"llama_profiling/clean_data/{task_type}/data.jsonl"
     output_file = f"{output_dir}/{task_type}.jsonl"
 
     if not os.path.exists(input_file):
@@ -143,7 +143,7 @@ def main():
     """Generate prompts for all task types."""
 
     # Create prompts directory
-    output_dir = "prompts"
+    output_dir = "llama_profiling/prompts"
     os.makedirs(output_dir, exist_ok=True)
     print(f"Created directory: {output_dir}/\n")
 

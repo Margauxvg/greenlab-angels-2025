@@ -29,7 +29,7 @@ class EnergiBridge(CLISource):
         
         super().__init__()
         
-        self.requires_admin = True
+        self.requires_admin = False
         self.target_program = target_program
         self.logfile = out_file
         self.args = {

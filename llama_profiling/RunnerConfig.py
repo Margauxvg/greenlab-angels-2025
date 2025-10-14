@@ -1,3 +1,4 @@
+import json
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 from EventManager.Models.RunnerEvents import RunnerEvents
@@ -25,11 +26,39 @@ import os
 class HttpHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         if self.path == '/run-finished':
+            print('Webhook invoked, saving files...')
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+
+            try:
+                body = json.loads(post_data)
+            except json.JSONDecodeError:
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b"Invalid JSON")
+                return
+
+            files = body.get("files")
+            if not isinstance(files, dict):
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b"'files' must be a JSON object")
+                return
+
+            # Write each key/value pair to a file
+            for filename, content in files.items():
+                with open('tmp_' + filename, "w", encoding="utf-8") as f:
+                    f.write(content)
+                    print('Saved ', filename)
+
             self.send_response(200)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write("success".encode('utf-8'))
+            print('Webhook successful')
             self.server.webhook_received = True
+        else:
+            print("404 - incorrect endpoint")
 
 class RunnerConfig:
     ROOT_DIR = Path(dirname(realpath(__file__)))
@@ -48,7 +77,7 @@ class RunnerConfig:
 
     """The time Experiment Runner will wait after a run completes.
     This can be essential to accommodate for cooldown periods on some systems."""
-    time_between_runs_in_ms:    int             = 1
+    time_between_runs_in_ms:    int             = 30_000
 
     # Dynamic configurations can be one-time satisfied here before the program takes the config as-is
     # e.g. Setting some variable based on some criteria
@@ -73,9 +102,9 @@ class RunnerConfig:
     def create_run_table_model(self) -> RunTableModel:
         """Create and return the run_table model here. A run_table is a List (rows) of tuples (columns),
         representing each run performed"""
-        generation = FactorModel("generation", ['1', '2', '3', '3.1', '3.2', '4-scout', '4-maverick'])
-        model_size = FactorModel("model_size", ['1B', '3B', '6.7B', '8B', '11B', '13B', '17B'])
-        tasks = FactorModel("task", ["BoolQ", "CB", "COPA", "MultiRC", "ReCoRD", "RTE", "WiC", "WSC"])
+        generation = FactorModel("generation", ['3.2'])
+        model_size = FactorModel("model_size", ['1B'])
+        tasks = FactorModel("task", ["COPA", "BoolQ"])
         self.run_table_model = RunTableModel(
             factors=[generation, model_size, tasks],
             shuffle=True,
@@ -88,7 +117,7 @@ class RunnerConfig:
                 {generation: ['4-scout'], model_size: ['1B', '3B', '6.7B', '8B', '11B', '13B']}, # only run 17B
                 {generation: ['4-maverick'], model_size: ['1B', '3B', '6.7B', '8B', '11B', '13B']}, # only run 17B
             ],
-            data_columns=[]
+            data_columns=['energy']
         )
         return self.run_table_model
 
@@ -96,16 +125,16 @@ class RunnerConfig:
         """Perform any activity required before starting the experiment here
         Invoked only once during the lifetime of the program."""
 
-        hf_token = os.getenv("HF_TOKEN")
-        # To run over ssh
-        with open("./llama-profiling/bin/init_env.sh") as script:
-            body = script.read()
-            result = subprocess.run(
-                ["ssh", "angels@91.99.79.179", "bash", "-s", hf_token],
-                input=body,
-                text=True,
-                check=True,
-            )
+        # hf_token = os.getenv("HF_TOKEN")
+        # # To run over ssh
+        # with open("./llama-profiling/bin/init_env.sh") as script:
+        #     body = script.read()
+        #     result = subprocess.run(
+        #         ["ssh", "angels@91.99.79.179", "bash", "-s", hf_token],
+        #         input=body,
+        #         text=True,
+        #         check=True,
+        #     )
 
         # Testing locally:
         # result = subprocess.run(['./llama-profiling/bin/init_env.sh', hf_token], check=True)
@@ -128,12 +157,16 @@ class RunnerConfig:
 
         generation = context.execute_run["generation"]
         parameters = context.execute_run["model_size"]
+        task = context.execute_run["task"]
 
-        self.profiler = EnergiBridge(target_program=f"python llama-profiling/bin/run_model.py {generation} {parameters}",
-                                     out_file=context.run_dir / "energibridge.csv")
+        data = {
+            "model": f"{generation}-{parameters}",
+            "dataset": task,
+            "callback_url": "http://localhost:4448/run-finished"
+        }
+        requests.post("http://localhost:9999/start", json=data)
 
         self.start_server(4448)
-        self.profiler.start()
 
 
     def start_server(self, port=4448):
@@ -145,59 +178,14 @@ class RunnerConfig:
 
     def interact(self, context: RunnerContext) -> None:
         """Perform any interaction with the running target system here, or block here until the target finishes."""
-        # The server isn't immediately online, this polls until it is successful
-        self.wait_for_server()
 
-        inputs = self.read_tsv("./llama-profiling/glue_data/CoLA/test.tsv")
-        for i,e in enumerate(inputs):
-            #start_time = time.time() * 1000  # Convert to milliseconds
-            #out = self.run_prompt(e["sentence"])
-            #end_time = time.time() * 1000  # Convert to milliseconds
-            #duration_ms = end_time - start_time
-            #output.console_log(f"Prompt execution took {duration_ms:.2f} ms")
-            #output.console_log(out)
-
-            # Perform next run
-            # call greenlab server endpoint
-
-            # Waiting for run to complete
-            print("Starting run ", i)
-            while not self.httpd.webhook_received:
-                self.httpd.handle_request()
-            print("Webhook has been called, progressing to next run")
-            self.httpd.webhook_received = False
-
-
-    def run_prompt(self, prompt_text: str):
-        # get the current unix timestamp
-        response = requests.post("http://localhost:9999/prompt", data=prompt_text)
-        return response.text
-
-    def read_tsv(self, file_path: str) -> List[Dict[str, str]]:
-        """Read a TSV file and return the data as a list of dictionaries."""
-        data = []
-        with open(file_path, 'r', encoding='utf-8') as file:
-            reader = csv.DictReader(file, delimiter='\t')
-            for row in reader:
-                data.append(dict(row))
-        return data
+        while not self.httpd.webhook_received:
+            self.httpd.handle_request()
+        print("Webhook has been called, progressing to next run")
+        self.httpd.webhook_received = False
 
     def stop_measurement(self, context: RunnerContext) -> None:
         """Perform any activity here required for stopping measurements."""
-
-        # # Send SIGTERM to server process on port 9999
-        try:
-            result = subprocess.run(['sudo', 'lsof', '-ti', ':9999'], capture_output=True, text=True)
-            if result.stdout.strip():
-                pid = int(result.stdout.strip())
-                output.console_log(f"Sending SIGTERM to server process {pid}")
-                subprocess.run(['sudo', 'kill', '-TERM', str(pid)])
-            else:
-                output.console_log("No process found on port 9999")
-        except Exception as e:
-            output.console_log(f"Error stopping server: {e}")
-
-        stdout = self.profiler.stop(wait=True)
 
     def stop_run(self, context: RunnerContext) -> None:
         """Perform any activity here required for stopping the run.
@@ -210,10 +198,24 @@ class RunnerConfig:
         You can also store the raw measurement data under `context.run_dir`
         Returns a dictionary with keys `self.run_table_model.data_columns` and their values populated"""
 
-        eb_log, eb_summary = self.profiler.parse_log(self.profiler.logfile, 
-                                                     self.profiler.summary_logfile)
+        prefix = 'tmp_'
+        eb_log = 'energibridge.csv'
+        eb_summary = 'energibridge-summary.txt'
+        p_out = 'prompts_out.tsv'
 
-        return {"energy": 0}
+        profiler_logfile = context.run_dir / eb_log
+        profiler_summary = context.run_dir / eb_summary
+        prompts_out = context.run_dir / p_out
+
+        shutil.copyfile(prefix + eb_log, profiler_logfile)
+        shutil.copyfile(prefix + eb_summary, profiler_summary)
+        shutil.copyfile(prefix + p_out, prompts_out)
+
+        eb_log, eb_summary = EnergiBridge.parse_log(profiler_logfile, 
+                                                     profiler_summary)
+
+
+        return {"energy": eb_summary['total_joules']}
 
     def after_experiment(self) -> None:
         """Perform any activity required after stopping the experiment here
@@ -221,19 +223,6 @@ class RunnerConfig:
 
         output.console_log("Config.after_experiment() called!")
         # shutil.rmtree("llama-profiling/experiments")
-
-    def wait_for_server(self) -> None:
-        max_attempts = 12  # 12 attempts * 5 seconds = 60 seconds
-        for attempt in range(max_attempts):
-            try:
-                requests.post("http://localhost:9999/prompt", timeout=5)
-                output.console_log("Successfully reached server")
-                break
-            except requests.exceptions.ConnectionError:
-                if attempt < max_attempts - 1:
-                    time.sleep(5)
-                else:
-                    output.console_log("Server not available on port 9999 after 60 seconds")
 
     # ================================ DO NOT ALTER BELOW THIS LINE ================================
     experiment_path:            Path             = None

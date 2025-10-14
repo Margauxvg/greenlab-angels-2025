@@ -69,6 +69,26 @@ class EnergiBridge(CLISource):
 
         return f"Energy consumption in joules: {total_joules} for {elapsed_time} sec of execution"
 
+    def _validate_stop(self, stdout, stderr):
+        """
+        Override base class validation to be more lenient.
+        The target program may output warnings/progress to stderr
+        that aren't actual errors (e.g., PyTorch deprecation warnings).
+        Only raise an error if energibridge itself failed.
+        """
+        # Check if energibridge itself reported an error (not the target program)
+        # EnergiBridge errors typically contain specific keywords
+        error_indicators = ["error", "failed", "could not", "unable to"]
+        stderr_lower = stderr.lower()
+
+        # Only raise if we see actual error indicators
+        if any(indicator in stderr_lower for indicator in error_indicators):
+            raise RuntimeWarning(f"{self.source_name} did not stop correctly, or encountered an error: {stderr}")
+
+        # Otherwise, just log the stderr as informational (deprecation warnings, progress, etc.)
+        if stderr:
+            print(f"[INFO] {self.source_name} stderr (non-fatal): {stderr[:200]}...")  # Truncate for readability
+
     # We also want to save the summary of EnergiBridge if present
     def stop(self, wait=False):
 

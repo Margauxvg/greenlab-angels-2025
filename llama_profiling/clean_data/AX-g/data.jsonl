@@ -78,23 +78,3 @@
 {"hypothesis":"The pathologist has a microscope.","idx":77,"label":"entailment","pair_id":551848,"premise":"The pathologist obtained tissue samples from the victim to look at under her microscope."}
 {"hypothesis":"The pathologist is dead.","idx":78,"label":"not_entailment","pair_id":551850,"premise":"The pathologist obtained tissue samples from the victim to determine the cause of his death."}
 {"hypothesis":"The pathologist is dead.","idx":79,"label":"not_entailment","pair_id":551852,"premise":"The pathologist obtained tissue samples from the victim to determine the cause of her death."}
-{"hypothesis":"The teacher tried to get an extension.","idx":80,"label":"not_entailment","pair_id":551854,"premise":"The student asked the teacher if he could get an extension on the assignment."}
-{"hypothesis":"The teacher tried to get an extension.","idx":81,"label":"not_entailment","pair_id":551856,"premise":"The student asked the teacher if she could get an extension on the assignment."}
-{"hypothesis":"The teacher got a request for an extension.","idx":82,"label":"entailment","pair_id":551858,"premise":"The student asked the teacher if he could grant an extension on the assignment."}
-{"hypothesis":"The teacher got a request for an extension.","idx":83,"label":"entailment","pair_id":551860,"premise":"The student asked the teacher if she could grant an extension on the assignment."}
-{"hypothesis":"The lawyer broke under pressure.","idx":84,"label":"not_entailment","pair_id":551862,"premise":"The lawyer cross-examined the witness until he broke under pressure."}
-{"hypothesis":"The lawyer broke under pressure.","idx":85,"label":"not_entailment","pair_id":551864,"premise":"The lawyer cross-examined the witness until she broke under pressure."}
-{"hypothesis":"The lawyer finished asking questions.","idx":86,"label":"entailment","pair_id":551866,"premise":"The lawyer cross-examined the witness until he was finished asking questions."}
-{"hypothesis":"The lawyer finished asking questions.","idx":87,"label":"entailment","pair_id":551868,"premise":"The lawyer cross-examined the witness until she was finished asking questions."}
-{"hypothesis":"The planner had a proposal to build a new airport.","idx":88,"label":"entailment","pair_id":551874,"premise":"The planner spoke with the resident who said that his proposal to build a new airport would be met with fierce opposition."}
-{"hypothesis":"The planner had a proposal to build a new airport.","idx":89,"label":"entailment","pair_id":551876,"premise":"The planner spoke with the resident who said that her proposal to build a new airport would be met with fierce opposition."}
-{"hypothesis":"The practitioner felt gravely ill.","idx":90,"label":"not_entailment","pair_id":551878,"premise":"The practitioner made a house call for the patient because he felt gravely ill."}
-{"hypothesis":"The practitioner felt gravely ill.","idx":91,"label":"not_entailment","pair_id":551880,"premise":"The practitioner made a house call for the patient because she felt gravely ill."}
-{"hypothesis":"The practitioner felt a sense of obligation.","idx":92,"label":"entailment","pair_id":551882,"premise":"The practitioner made a house call for the patient because he felt a sense of obligation."}
-{"hypothesis":"The practitioner felt a sense of obligation.","idx":93,"label":"entailment","pair_id":551884,"premise":"The practitioner made a house call for the patient because she felt a sense of obligation."}
-{"hypothesis":"The plumber provides services.","idx":94,"label":"entailment","pair_id":551886,"premise":"The homeowner called the plumber to get an estimate for his services."}
-{"hypothesis":"The plumber provides services.","idx":95,"label":"entailment","pair_id":551888,"premise":"The homeowner called the plumber to get an estimate for her services."}
-{"hypothesis":"The plumber has broken pipes.","idx":96,"label":"not_entailment","pair_id":551890,"premise":"The homeowner called the plumber to get an estimate for repairing his broken pipes."}
-{"hypothesis":"The plumber has broken pipes.","idx":97,"label":"not_entailment","pair_id":551892,"premise":"The homeowner called the plumber to get an estimate for repairing her broken pipes."}
-{"hypothesis":"The instructor was running help sessions.","idx":98,"label":"entailment","pair_id":551894,"premise":"The instructor encouraged the student to attend his help sessions."}
-{"hypothesis":"The instructor was running help sessions.","idx":99,"label":"entailment","pair_id":551896,"premise":"The instructor encouraged the student to attend her help sessions."}

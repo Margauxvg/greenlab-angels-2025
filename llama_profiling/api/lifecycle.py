@@ -21,7 +21,7 @@ class LifecycleController:
         self.cb_url = body["callback_url"]
         dataset = body["dataset"]
 
-        self.profiler = EnergiBridge(target_program=f"python llama_profiling/bin/model_runner.py {model} {dataset} {self.cb_url}",
+        self.profiler = EnergiBridge(target_program=f"python llama_profiling/bin/model_runner.py {model} {dataset} http://localhost:9999/stop",
                                      out_file=Path("energibridge.csv"))
 
         self.profiler.start()
@@ -35,7 +35,8 @@ class LifecycleController:
         if self.profiler:
             self.profiler.stop(wait=True)
             print("Profiler stopped successfully")
-            self.send_callback()
+
+        self.send_callback()
 
     def send_callback(self, max_retries=5, initial_delay=1):
         delay = initial_delay
@@ -48,7 +49,7 @@ class LifecycleController:
 
         for attempt in range(max_retries):
             try:
-                response = requests.post(self.cb_url, timeout=10, json={"files": payload})
+                response = requests.post(callback_url, timeout=10, json={"files": payload})
                 response.raise_for_status()
                 print(f"Callback sent successfully to {callback_url}")
                 return

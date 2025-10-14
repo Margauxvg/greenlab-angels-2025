@@ -25,7 +25,7 @@ class ModelRunner:
                 self.log(f"running prompt {i + 1} out of {len(self.dataset)}")
                 self.run_prompt(prompt)
 
-            self.write_outputs_to_tsv("./prompt_outs.tsv")
+            self.write_outputs_to_tsv("./prompts_out.tsv")
             self.send_callback()
         except Exception as e:
             with open("errors.txt", "w") as f:

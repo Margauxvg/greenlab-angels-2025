@@ -5,6 +5,7 @@ import json
 import time
 from vllm import LLM, SamplingParams
 from transformers import AutoTokenizer
+from pathlib import Path
 import requests
 
 class ModelRunner:

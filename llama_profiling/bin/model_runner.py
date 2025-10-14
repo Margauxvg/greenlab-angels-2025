@@ -11,6 +11,7 @@ import requests
 class ModelRunner:
     def __init__(self, model, dataset, callback_url):
         self.log_file = open("logs.txt", "w")
+        self.dataset = None
 
         try:
             self.log("Initializing model")

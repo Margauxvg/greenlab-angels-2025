@@ -21,49 +21,42 @@
 
   if [ ! -d "llama_profiling/models/2-7B" ]; then
       echo "Model not found locally. Downloading..."
-      hf download meta-llama/Llama-2-7b-hf --local-dir llama_profiling/models/2-7B --exclude "original/*"
+      hf download meta-llama/Llama-2-7b-chat-hf --local-dir llama_profiling/models/2-7B --exclude "original/*"
   else
       echo "Model already exists at llama_profiling/models/2-7B. Skipping download."
   fi
 
   if [ ! -d "llama_profiling/models/2-13B" ]; then
       echo "Model not found locally. Downloading..."
-      hf download meta-llama/Llama-2-13b-hf --local-dir llama_profiling/models/2-13B --exclude "original/*"
+      hf download meta-llama/Llama-2-13b-chat-hf --local-dir llama_profiling/models/2-13B --exclude "original/*"
   else
       echo "Model already exists at llama_profiling/models/2-13B. Skipping download."
   fi
 
   if [ ! -d "llama_profiling/models/3-8B" ]; then
       echo "Model not found locally. Downloading..."
-      hf download meta-llama/Meta-Llama-3-8B --local-dir llama_profiling/models/3-8B --exclude "original/*"
+      hf download meta-llama/Meta-Llama-3-8B-Instruct --local-dir llama_profiling/models/3-8B --exclude "original/*"
   else
       echo "Model already exists at llama_profiling/models/3-8B. Skipping download."
   fi
 
   if [ ! -d "llama_profiling/models/3.1-8B" ]; then
       echo "Model not found locally. Downloading..."
-      hf download meta-llama/Meta-Llama-3.1-8B --local-dir llama_profiling/models/3.1-8B --exclude "original/*"
+      hf download meta-llama/Meta-Llama-3.1-8B-Instruct --local-dir llama_profiling/models/3.1-8B --exclude "original/*"
   else
       echo "Model already exists at llama_profiling/models/3.1-8B. Skipping download."
   fi
 
   if [ ! -d "llama_profiling/models/3.2-1B" ]; then
       echo "Model not found locally. Downloading..."
-      hf download meta-llama/Llama-3.2-1B --local-dir llama_profiling/models/3.2-1B --exclude "original/*"
+      hf download meta-llama/Llama-3.2-1B-Instruct --local-dir llama_profiling/models/3.2-1B --exclude "original/*"
   else
       echo "Model already exists at llama_profiling/models/3.2-1B. Skipping download."
   fi
 
   if [ ! -d "llama_profiling/models/3.2-3B" ]; then
       echo "Model not found locally. Downloading..."
-      hf download meta-llama/Llama-3.2-3B --local-dir llama_profiling/models/3.2-3B --exclude "original/*"
+      hf download meta-llama/Llama-3.2-3B-Instruct --local-dir llama_profiling/models/3.2-3B --exclude "original/*"
   else
       echo "Model already exists at llama_profiling/models/3.2-3B. Skipping download."
-  fi
-
-  if [ ! -d "llama_profiling/models/4-scout-17B" ]; then
-      echo "Model not found locally. Downloading..."
-      hf download meta-llama/Llama-4-Scout-17B-16E --local-dir llama_profiling/models/4-scout-17B --exclude "original/*"
-  else
-      echo "Model already exists at llama_profiling/models/4-scout-17B. Skipping download."
   fi

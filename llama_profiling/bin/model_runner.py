@@ -10,13 +10,22 @@ import requests
 
 class ModelRunner:
     def __init__(self, model, dataset, callback_url):
-        self.init_model(model)
-        self.init_dataset(dataset)
-
-        self.callback_url = callback_url
-        self.outputs = []
-
         self.log_file = open("logs.txt", "w")
+
+        try:
+            self.log("Initializing model")
+            self.init_model(model)
+            self.log("Successfully initialized model")
+
+            self.log("Initialize dataset")
+            self.init_dataset(dataset)
+            self.log("Successfully initalized dataset")
+
+            self.callback_url = callback_url
+            self.outputs = []
+        except Exception as e:
+            with open("errors.txt", "w") as f:
+                print(f"Error: {e}", file=f)
 
     def measure(self):
         try:
@@ -30,8 +39,6 @@ class ModelRunner:
         except Exception as e:
             with open("errors.txt", "w") as f:
                 print(f"Error: {e}", file=f)
-
-            self.send_callback()
         finally:
             self.log_file.close()
 
@@ -101,8 +108,6 @@ class ModelRunner:
             model=model_path,
             max_model_len=2048,
             max_num_batched_tokens=2048,
-            enforce_eager=True,
-            gpu_memory_utilization=0.85
         )
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
 

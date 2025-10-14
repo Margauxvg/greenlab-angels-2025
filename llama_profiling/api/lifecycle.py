@@ -22,7 +22,7 @@ class LifecycleController:
         dataset = body["dataset"]
 
         self.profiler = EnergiBridge(target_program=f"python llama_profiling/bin/model_runner.py {model} {dataset} http://localhost:8020/stop",
-                                     out_file=Path("energibridge.csv"))
+                                     out_file=Path("energibridge.csv"), additional_args={"--gpu": None})
 
         self.profiler.start()
 

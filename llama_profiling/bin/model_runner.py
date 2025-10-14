@@ -111,7 +111,12 @@ class ModelRunner:
             print(f"Error: Model path does not exist: {model_path}")
             sys.exit(1)
 
-        self.model = LLM(model=model_path, max_model_len=10240)
+        # Only these ones are > 10k
+        if model == '3.1-8B' or model == '3.2-1B' or model == '3.2-3B':
+            self.model = LLM(model=model_path, max_model_len=10240)
+        else:
+            self.model = LLM(model=model_path)
+
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
 
     def init_dataset(self, dataset):

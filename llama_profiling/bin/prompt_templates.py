@@ -22,7 +22,7 @@ PROMPT_TEMPLATES = {
 
 Question: {{question}}
 
-Answer with only 'True' or 'False'.""",
+Explain your choice.""",
         "fields": ["passage", "question"],
         "output_type": "boolean",
         "answer_format": "True or False"
@@ -37,7 +37,7 @@ Premise: {{premise}}
 Choice 1: {{choice1}}
 Choice 2: {{choice2}}
 
-Answer with only '1' or '2'.""",
+Explain your choice.""",
         "fields": ["premise", "choice1", "choice2", "question"],
         "output_type": "choice",
         "answer_format": "1 or 2"
@@ -49,7 +49,7 @@ Answer with only '1' or '2'.""",
 
 Hypothesis: {{hypothesis}}
 
-Does the premise entail the hypothesis? Answer with only 'entailment', 'contradiction', or 'neutral'.""",
+Does the premise entail the hypothesis? Explain your choice.""",
         "fields": ["premise", "hypothesis"],
         "output_type": "classification",
         "answer_format": "entailment, contradiction, or neutral"
@@ -61,7 +61,7 @@ Does the premise entail the hypothesis? Answer with only 'entailment', 'contradi
 
 Hypothesis: {{hypothesis}}
 
-Does the hypothesis follow from the premise? Answer with only 'entailment' or 'not_entailment'.""",
+Does the hypothesis follow from the premise? Explain your choice.""",
         "fields": ["premise", "hypothesis"],
         "output_type": "classification",
         "answer_format": "entailment or not_entailment"
@@ -74,7 +74,7 @@ Does the hypothesis follow from the premise? Answer with only 'entailment' or 'n
 Sentence 1: {{sentence1}}
 Sentence 2: {{sentence2}}
 
-Answer with only 'True' or 'False'.""",
+Explain your choice.""",
         "fields": ["word", "sentence1", "sentence2"],
         "output_type": "boolean",
         "answer_format": "True or False"
@@ -84,7 +84,7 @@ Answer with only 'True' or 'False'.""",
         "description": "Winograd Schema Challenge - Determine pronoun coreference",
         "template": """{{text}}
 
-In the sentence above, does "{{span2_text}}" refer to "{{span1_text}}"? Answer with only 'True' or 'False'.""",
+In the sentence above, does "{{span2_text}}" refer to "{{span1_text}}"? Explain your choice.""",
         "fields": ["text", "span1_text", "span2_text"],
         "output_type": "boolean",
         "answer_format": "True or False"
@@ -98,7 +98,7 @@ Question: {{question}}
 
 Answer: {{answer}}
 
-Is this answer correct? Answer with only 'True' or 'False'.""",
+Is this answer correct? Explain your choice.""",
         "fields": ["passage", "question", "answer"],
         "output_type": "boolean",
         "answer_format": "True or False",
@@ -111,7 +111,7 @@ Is this answer correct? Answer with only 'True' or 'False'.""",
 
 Question: {{query}}
 
-Based on the passage, what word or phrase should replace @placeholder? Answer with only the entity text.""",
+Based on the passage, what word or phrase should replace @placeholder? Explain your choice.""",
         "fields": ["passage", "query"],
         "output_type": "extraction",
         "answer_format": "Entity text from passage"

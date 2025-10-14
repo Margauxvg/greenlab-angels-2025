@@ -102,18 +102,17 @@ class RunnerConfig:
     def create_run_table_model(self) -> RunTableModel:
         """Create and return the run_table model here. A run_table is a List (rows) of tuples (columns),
         representing each run performed"""
-        generation = FactorModel("generation", ['2', '3', '3.1', '3.2', '4-scout'])
-        model_size = FactorModel("model_size", ['1B', '7B'])
+        generation = FactorModel("generation", ['2', '3', '3.1', '3.2'])
+        model_size = FactorModel("model_size", ['1B', '3B', '7B', '8B', '13B'])
         tasks = FactorModel("task", ["BoolQ", "CB", "COPA", "RTE", "WiC", "WSC"])
         self.run_table_model = RunTableModel(
             factors=[generation, model_size, tasks],
             shuffle=True,
             exclude_combinations=[
-                {generation: ['2'], model_size: ['1B', '3B', '8B', '11B', '17B']}, # only run 7B and 13B
-                {generation: ['3'], model_size: ['1B', '3B', '7B', '11B', '13B', '17B']}, # only run 8B
-                {generation: ['3.1'], model_size: ['1B', '3B', '7B', '11B', '13B', '17B']}, # only run 8B
-                {generation: ['3.2'], model_size: ['7B', '8B', '13B', '17B']}, # only run 1B, 3B and 11B
-                {generation: ['4-scout'], model_size: ['1B', '3B', '7B', '8B', '11B', '13B']}, # only run 17B
+                {generation: ['2'], model_size: ['1B', '3B', '8B']}, # only run 7B and 13B
+                {generation: ['3'], model_size: ['1B', '3B', '7B', '13B']}, # only run 8B
+                {generation: ['3.1'], model_size: ['1B', '3B', '7B', '13B']}, # only run 8B
+                {generation: ['3.2'], model_size: ['7B', '8B', '13B']}, # only run 1B, and 3B
             ],
             data_columns=['energy']
         )

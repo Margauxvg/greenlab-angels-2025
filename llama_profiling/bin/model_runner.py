@@ -3,6 +3,7 @@ import sys
 import os
 import json
 import time
+import traceback
 from vllm import LLM, SamplingParams
 from transformers import AutoTokenizer
 from pathlib import Path
@@ -27,6 +28,8 @@ class ModelRunner:
         except Exception as e:
             with open("errors.txt", "w") as f:
                 print(f"Error: {e}", file=f)
+                print("\nStacktrace:", file=f)
+                print(traceback.format_exc(), file=f)
             raise
 
     def measure(self):
@@ -41,6 +44,8 @@ class ModelRunner:
         except Exception as e:
             with open("errors.txt", "w") as f:
                 print(f"Error: {e}", file=f)
+                print("\nStacktrace:", file=f)
+                print(traceback.format_exc(), file=f)
         finally:
             self.log_file.close()
 

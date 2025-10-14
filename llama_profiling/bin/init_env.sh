@@ -8,8 +8,6 @@ fi
 
 HF_TOKEN=$1
 
-cd storage
-
 # download the repo
 if [ ! -d "greenlab-angels-2025" ]; then
     git clone https://github.com/Margauxvg/greenlab-angels-2025.git

@@ -104,7 +104,7 @@ class RunnerConfig:
         representing each run performed"""
         generation = FactorModel("generation", ['3.2'])
         model_size = FactorModel("model_size", ['1B'])
-        tasks = FactorModel("task", ["COPA", "BoolQ"])
+        tasks = FactorModel("task", ["BoolQ", "CB", "COPA", "RTE", "WiC", "WSC"])
         self.run_table_model = RunTableModel(
             factors=[generation, model_size, tasks],
             shuffle=True,
@@ -162,9 +162,10 @@ class RunnerConfig:
         data = {
             "model": f"{generation}-{parameters}",
             "dataset": task,
-            "callback_url": "http://localhost:4448/run-finished"
+            "callback_url": "http://138.199.215.33:4448/run-finished"
         }
-        requests.post("http://localhost:9999/start", json=data)
+
+        requests.post("http://localhost:8020/start", json=data)
 
         self.start_server(4448)
 

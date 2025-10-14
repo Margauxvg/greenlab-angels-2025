@@ -21,7 +21,7 @@ class LifecycleController:
         self.cb_url = body["callback_url"]
         dataset = body["dataset"]
 
-        self.profiler = EnergiBridge(target_program=f"python llama_profiling/bin/model_runner.py {model} {dataset} http://localhost:9999/stop",
+        self.profiler = EnergiBridge(target_program=f"python llama_profiling/bin/model_runner.py {model} {dataset} http://localhost:8020/stop",
                                      out_file=Path("energibridge.csv"))
 
         self.profiler.start()

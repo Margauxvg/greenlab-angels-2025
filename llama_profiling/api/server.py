@@ -3,7 +3,7 @@ import sys
 import signal
 
 class APIServer:
-    port: int = 9999
+    port: int = 8020
 
     def __init__(self, router):
         server_address = ('', self.port)

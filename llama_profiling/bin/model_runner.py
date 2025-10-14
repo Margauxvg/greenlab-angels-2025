@@ -27,6 +27,7 @@ class ModelRunner:
         except Exception as e:
             with open("errors.txt", "w") as f:
                 print(f"Error: {e}", file=f)
+            raise
 
     def measure(self):
         try:

@@ -58,7 +58,7 @@ class ModelRunner:
 
         start = int(time.time())
         formatted_prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        sampling_params = SamplingParams(temperature=0.7, top_p=0.9)
+        sampling_params = SamplingParams(temperature=0.7, top_p=0.9, max_tokens=2048)
         outputs = self.model.generate([formatted_prompt], sampling_params)
         end = int(time.time())
         resp = outputs[0].outputs[0].text

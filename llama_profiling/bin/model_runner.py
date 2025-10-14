@@ -54,14 +54,12 @@ class ModelRunner:
         self.log_file.flush()
 
     def run_prompt(self, prompt):
+        messages = [{"role": "user", "content": prompt}]
+
         start = int(time.time())
-
-        # No chat template needed
-        formatted_prompt = prompt  # just the raw prompt
-
+        formatted_prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         sampling_params = SamplingParams(temperature=0.7, top_p=0.9)
         outputs = self.model.generate([formatted_prompt], sampling_params)
-
         end = int(time.time())
         resp = outputs[0].outputs[0].text
 

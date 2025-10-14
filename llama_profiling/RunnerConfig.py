@@ -108,6 +108,7 @@ class RunnerConfig:
         self.run_table_model = RunTableModel(
             factors=[generation, model_size, tasks],
             shuffle=True,
+            repetitions=30,
             exclude_combinations=[
                 {generation: ['2'], model_size: ['1B', '3B', '8B']}, # only run 7B and 13B
                 {generation: ['3'], model_size: ['1B', '3B', '7B', '13B']}, # only run 8B

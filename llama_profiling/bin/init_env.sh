@@ -21,14 +21,14 @@
 
   if [ ! -d "llama_profiling/models/2-7B" ]; then
       echo "Model not found locally. Downloading..."
-      hf download meta-llama/Llama-2-7b --local-dir llama_profiling/models/2-7B --exclude "original/*"
+      hf download meta-llama/Llama-2-7b-hf --local-dir llama_profiling/models/2-7B --exclude "original/*"
   else
       echo "Model already exists at llama_profiling/models/2-7B. Skipping download."
   fi
 
   if [ ! -d "llama_profiling/models/2-13B" ]; then
       echo "Model not found locally. Downloading..."
-      hf download meta-llama/Llama-2-13b --local-dir llama_profiling/models/2-13B --exclude "original/*"
+      hf download meta-llama/Llama-2-13b-hf --local-dir llama_profiling/models/2-13B --exclude "original/*"
   else
       echo "Model already exists at llama_profiling/models/2-13B. Skipping download."
   fi

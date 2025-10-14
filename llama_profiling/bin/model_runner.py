@@ -113,7 +113,7 @@ class ModelRunner:
             print(f"Error: Model path does not exist: {model_path}")
             sys.exit(1)
 
-        self.model = LLM(model=model_path)
+        self.model = LLM(model=model_path, max_model_len=10240)
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
 
     def init_dataset(self, dataset):

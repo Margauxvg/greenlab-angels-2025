@@ -2,8 +2,9 @@
 """
 Script to create a clean dataset with 100 samples from each task type.
 
-TODO::CITE CLAUDE
-
+Code generated with assistance from Claude Code (Claude Sonnet 4.5)
+Anthropic. (2025). Claude Code. https://docs.claude.com/en/docs/claude-code
+Prompt:
 could you please look at the data directory in llama_profiling.\
 \
 Your task is to create a new "clean_data" directory, and go over each task type in the data directory and select 100 samples from each task type, and 

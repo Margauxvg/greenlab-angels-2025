@@ -4,8 +4,9 @@ Prompt templates for each SuperGLUE task type.
 Each template is designed to evaluate LLMs on the specific task.
 Templates use {{variable}} syntax for field substitution.
 
-TODO::CITE CLAUDE
-
+Code generated with assistance from Claude Code (Claude Sonnet 4.5)
+Anthropic. (2025). Claude Code. https://docs.claude.com/en/docs/claude-code
+Prompt:
 Now that we have the "clean_data" directory, I would like to construct appropriate LLM prompts based on the structure of each task type. Please look 
 at the structure of each task type - additionally if you have context of these tasks already that is great - and think about how they could be 
 structured as an appropriate evaluation prompt for LLMs.\

@@ -3,8 +3,9 @@
 Script to generate prompt files for each task type.
 Creates a 'prompts' directory with JSONL files containing prompts and labels.
 
-TODO::CITE CLAUDE
-
+Code generated with assistance from Claude Code (Claude Sonnet 4.5)
+Anthropic. (2025). Claude Code. https://docs.claude.com/en/docs/claude-code
+Prompt:
 Now using the scripts you have written, could you create a new "prompt" directory which has a file for each task type and each file should contain 
 the 100 prompts for the type. Use an appropriate file format.
 """

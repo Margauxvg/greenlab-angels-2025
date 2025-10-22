@@ -11,8 +11,6 @@ Your task is to create a new "clean_data" directory, and go over each task type 
 put it into the new clean directory
 """
 import os
-import json
-import shutil
 
 # Define paths
 data_dir = "llama_profiling/data"

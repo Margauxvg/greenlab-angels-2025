@@ -16,10 +16,8 @@ from pathlib import Path
 from os.path import dirname, realpath
 import shutil
 import subprocess
-import signal
 import requests
 import time
-import csv
 import os
 
 
@@ -123,19 +121,20 @@ class RunnerConfig:
         """Perform any activity required before starting the experiment here
         Invoked only once during the lifetime of the program."""
 
-        # hf_token = os.getenv("HF_TOKEN")
-        # # To run over ssh
-        # with open("./llama-profiling/bin/init_env.sh") as script:
-        #     body = script.read()
-        #     result = subprocess.run(
-        #         ["ssh", "angels@91.99.79.179", "bash", "-s", hf_token],
-        #         input=body,
-        #         text=True,
-        #         check=True,
-        #     )
-
-        # Testing locally:
-        # result = subprocess.run(['./llama-profiling/bin/init_env.sh', hf_token], check=True)
+        remote_ip = os.getenv("REMOTE_IP")
+        # To run over ssh
+        if remote_ip and remote_ip != "":
+            with open("./llama_profiling/bin/init_env.sh") as script:
+                body = script.read()
+                subprocess.run(
+                    ["ssh", f"angels@{remote_ip}", "bash"],
+                    input=body,
+                    text=True,
+                    check=True,
+                )
+        else:
+            # This is just for testing locally
+            subprocess.Popen('nohup python . > experiment.log 2>&1 &', shell=True)
 
     def before_run(self) -> None:
         """Perform any activity required before starting a run.
@@ -157,16 +156,32 @@ class RunnerConfig:
         parameters = context.execute_run["model_size"]
         task = context.execute_run["task"]
 
+        orchestrator_host, gl_host = self.get_server_info()
         data = {
             "model": f"{generation}-{parameters}",
             "dataset": task,
-            "callback_url": "http://138.199.215.33:4448/run-finished"
+            "callback_url": f"http://{orchestrator_host}:4448/run-finished"
         }
 
-        requests.post("http://localhost:8020/start", json=data)
+        output.console_log(f"sending request to {gl_host}")
+
+        # Retry logic for the POST request
+        max_retries = 4
+        retry_delay = 1  # seconds
+
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(f"http://{gl_host}:8020/start", json=data, timeout=10)
+                response.raise_for_status()
+                break
+            except requests.exceptions.RequestException as e:
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                    retry_delay *= 2  # Exponential backoff
+                else:
+                    raise
 
         self.start_server(4448)
-
 
     def start_server(self, port=4448):
         server_address = ('', port)
@@ -215,13 +230,26 @@ class RunnerConfig:
 
 
         return {"energy": eb_summary['total_joules']}
+    
+    def get_server_info(self):
+        orchestrator_host = os.getenv("ORCHESTRATOR_HOST")
+        if orchestrator_host == None or orchestrator_host == "":
+            output.console_log("ORCHESTRATOR_HOST is a required env var")
+            exit(1)
+
+        gl_host = os.getenv("GREEN_LAB_HOST")
+        if gl_host == None or gl_host == "":
+            output.console_log("GREEN_LAB_HOST is a required env var")
+            exit(1)
+
+        return orchestrator_host, gl_host
 
     def after_experiment(self) -> None:
         """Perform any activity required after stopping the experiment here
         Invoked only once during the lifetime of the program."""
 
         output.console_log("Config.after_experiment() called!")
-        # shutil.rmtree("llama-profiling/experiments")
+        # shutil.rmtree("llama_profiling/experiments")
 
     # ================================ DO NOT ALTER BELOW THIS LINE ================================
     experiment_path:            Path             = None

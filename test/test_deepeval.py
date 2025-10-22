@@ -18,8 +18,8 @@
 # df = pd.read_csv(FILE_PATH, sep='\t')
 
 # # Ensure the output column exists
-# if "output accuracy" not in df.columns:
-#     df["output accuracy"] = [None] * len(df)
+# if "accuracy" not in df.columns:
+#     df["accuracy"] = [None] * len(df)
 
 # # ====== PREPARE FIRST TEST CASE ======
 # test_cases = []
@@ -37,14 +37,14 @@
 #     test_case = LLMTestCase(input=prompt, actual_output=response)
 #     metric.measure(test_case)
 
-#     df.at[0, "output accuracy"] = metric.score
+#     df.at[0, "accuracy"] = metric.score
 #     print(f"→ [0] Score: {metric.score:.2f}")
 
 #     # Save result
 #     df.to_csv(FILE_PATH, sep='\t', index=False)
-#     print(f"✅ Saved result for first test case to {FILE_PATH}")
+#     print(f"Saved result for first test case to {FILE_PATH}")
 # else:
-#     print("⚠️ No valid test cases found.")
+#     print("No valid test cases found.")
 
 
 import os
@@ -77,47 +77,59 @@ def find_tsv_files(base_dir):
 
 def process_tsv(file_path):
     """
-    Process a single TSV file: load it, compute relevancy for the first prompt/response,
-    save the score, and return the result.
+    Process a single TSV file: compute relevancy for each prompt/response,
+    skip already populated rows, and save progress after every update.
     """
     try:
         df = pd.read_csv(file_path, sep='\t')
 
-        if "output accuracy" not in df.columns:
-            df["output accuracy"] = [None] * len(df)
+        # Ensure output accuracy column exists
+        if "accuracy" not in df.columns:
+            df["accuracy"] = [None] * len(df)
 
-        test_cases = []
-        for _, row in df.iterrows():
+        total_rows = len(df)
+        print(f"Processing {os.path.basename(file_path)} ({total_rows} rows)")
+
+        processed = 0
+        for i, row in df.iterrows():
+            if i == 3 :
+                break
+            # Skip rows that already have a score
+            if pd.notna(row.get("accuracy")):
+                continue
+
             prompt = row.get("prompt")
             response = row.get("response")
-            if pd.notna(prompt) and pd.notna(response):
-                test_cases.append((prompt, response))
+            if pd.isna(prompt) or pd.isna(response):
+                continue
 
-        if not test_cases:
-            return f"⚠️ No valid test cases found in {file_path}"
+            # Measure relevance using deepeval
+            test_case = LLMTestCase(input=prompt, actual_output=response)
+            metric.measure(test_case)
+            df.at[i, "accuracy"] = metric.score
+            processed += 1
 
-        prompt, response = test_cases[0]
-        test_case = LLMTestCase(input=prompt, actual_output=response)
-        metric.measure(test_case)
-        df.at[0, "output accuracy"] = metric.score
+            # Save after every row (safe for interruption)
+            df.to_csv(file_path, sep='\t', index=False)
+            print(f"Saved row {i+1}/{total_rows} (Score: {metric.score:.3f})")
 
-        df.to_csv(file_path, sep='\t', index=False)
-        return f"✅ {os.path.basename(file_path)} → Score: {metric.score:.2f}"
+        print(f"Done {os.path.basename(file_path)} ({processed} new rows processed)")
+        return f"{os.path.basename(file_path)}: {processed} rows processed"
 
     except Exception as e:
-        return f"❌ Error processing {file_path}: {e}"
+        return f"Error processing {file_path}: {e}"
 
 
 def main():
     tsv_files = find_tsv_files(BASE_DIR)
     if not tsv_files:
-        print("⚠️ No TSV files found.")
+        print("No TSV files found.")
         return
 
-    print(f"🔍 Found {len(tsv_files)} TSV files. Starting parallel evaluation...")
+    print(f"Found {len(tsv_files)} TSV files. Starting parallel evaluation...")
 
     results = []
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=8) as executor:
         futures = {executor.submit(process_tsv, path): path for path in tsv_files}
         for future in as_completed(futures):
             results.append(future.result())
@@ -129,3 +141,92 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+# import os
+# import pandas as pd
+# import random
+# import time
+# from concurrent.futures import ProcessPoolExecutor, as_completed
+
+# # ====== CONFIGURATION ======
+# BASE_DIR = "../test/"
+# SLEEP_BETWEEN = 0.1
+
+# def find_tsv_files(base_dir):
+#     """
+#     Recursively find all TSV files named 'prompts_out.tsv' under the base directory.
+#     """
+#     tsv_paths = []
+#     for root, _, files in os.walk(base_dir):
+#         for f in files:
+#             if f == "prompts_out.tsv":
+#                 tsv_paths.append(os.path.join(root, f))
+#     return tsv_paths
+
+
+# def process_tsv(file_path):
+#     """
+#     Process a single TSV file: simulate metric computation for each prompt/response,
+#     save progress as we go, and return the result summary.
+#     """
+#     try:
+#         df = pd.read_csv(file_path, sep='\t')
+
+#         if "accuracy" not in df.columns:
+#             df["accuracy"] = [None] * len(df)
+
+#         total_rows = len(df)
+#         print(f"Processing {os.path.basename(file_path)} ({total_rows} rows)")
+
+#         processed = 0
+#         for i, row in df.iterrows():
+#             if pd.notna(row.get("accuracy")):
+#                 continue
+
+#             prompt = row.get("prompt")
+#             response = row.get("response")
+#             if pd.isna(prompt) or pd.isna(response):
+#                 continue
+
+#             time.sleep(SLEEP_BETWEEN)
+#             dummy_score = round(random.random(), 3)
+#             df.at[i, "accuracy"] = dummy_score
+#             processed += 1
+
+#             if processed % 5 == 0:
+#                 df.to_csv(file_path, sep='\t', index=False)
+#                 print(f"Progress saved ({processed}/{total_rows})")
+
+#         # final save
+#         df.to_csv(file_path, sep='\t', index=False)
+#         print(f"Done {os.path.basename(file_path)} ({processed} new rows)")
+
+#         return f"{os.path.basename(file_path)}: {processed} rows processed"
+
+#     except Exception as e:
+#         return f"Error processing {file_path}: {e}"
+
+
+# def main():
+#     tsv_files = find_tsv_files(BASE_DIR)
+#     if not tsv_files:
+#         print("No TSV files found.")
+#         return
+
+#     print(f"Found {len(tsv_files)} TSV files. Starting dummy evaluation...")
+
+#     results = []
+#     with ProcessPoolExecutor() as executor:
+#         futures = {executor.submit(process_tsv, path): path for path in tsv_files}
+#         for future in as_completed(futures):
+#             results.append(future.result())
+
+#     print("\n===== SUMMARY =====")
+#     for res in results:
+#         print(res)
+
+
+# if __name__ == "__main__":
+#     main()

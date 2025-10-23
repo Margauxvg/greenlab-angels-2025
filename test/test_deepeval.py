@@ -260,23 +260,27 @@
 #     try:
 #         df = pd.read_csv(file_path, sep='\t')
 
+#         # Create accuracy column if missing
 #         if "accuracy" not in df.columns:
 #             df["accuracy"] = [None] * len(df)
+#             print(f"Initialized accuracy column for {os.path.basename(file_path)}.")
+
+#         # Count how many rows already have values
+#         filled_count = df["accuracy"].notna().sum()
+#         if filled_count >= NUM_RANDOM_ROWS:
+#             print(f"Skipping {os.path.basename(file_path)} ({filled_count} rows already filled, >= NUM_RANDOM_ROWS).")
+#             return f"{os.path.basename(file_path)}: skipped ({filled_count} rows filled)"
+
+#         # Determine how many more rows need to be processed
+#         remaining_to_fill = NUM_RANDOM_ROWS - filled_count
 
 #         unprocessed_indices = df[df["accuracy"].isna()].index.tolist()
-
-#         if not unprocessed_indices:
-#             print(f"All rows already processed in {os.path.basename(file_path)}.")
-#             return f"{os.path.basename(file_path)}: 0 rows processed (already complete)"
-
-#         selected_indices = random.sample(unprocessed_indices, min(NUM_RANDOM_ROWS, len(unprocessed_indices)))
-
+#         selected_indices = random.sample(unprocessed_indices, min(remaining_to_fill, len(unprocessed_indices)))
 #         print(f"Processing {len(selected_indices)} random rows from {os.path.basename(file_path)}...")
 
 #         for i in selected_indices:
 #             prompt = df.at[i, "prompt"]
 #             response = df.at[i, "response"]
-
 #             if pd.isna(prompt) or pd.isna(response):
 #                 continue
 
@@ -284,6 +288,7 @@
 #             dummy_score = round(random.random(), 3)
 #             df.at[i, "accuracy"] = dummy_score
 
+#         # Save after processing batch
 #         df.to_csv(file_path, sep='\t', index=False)
 #         print(f"Done {os.path.basename(file_path)} ({len(selected_indices)} rows updated)")
 
@@ -314,7 +319,6 @@
 
 # if __name__ == "__main__":
 #     main()
-
 
 
 
@@ -350,22 +354,25 @@ def find_tsv_files(base_dir):
 def process_tsv(file_path):
     try:
         df = pd.read_csv(file_path, sep='\t')
-
         if "accuracy" not in df.columns:
             df["accuracy"] = [None] * len(df)
+            print(f"Initialized accuracy column for {os.path.basename(file_path)}.")
 
-        total_rows = len(df)
-        print(f"Processing {os.path.basename(file_path)} ({total_rows} rows)")
+        # Count how many rows already have a value
+        filled_count = df["accuracy"].notna().sum()
+        if filled_count >= NUM_RANDOM_ROWS:
+            print(f"Skipping {os.path.basename(file_path)} ({filled_count} rows already filled, >= NUM_RANDOM_ROWS).")
+            return f"{os.path.basename(file_path)}: skipped ({filled_count} rows filled)"
+
+        # Determine how many more rows need to be processed
+        remaining_to_fill = NUM_RANDOM_ROWS - filled_count
 
         unprocessed_indices = df[df["accuracy"].isna()].index.tolist()
-
-        if not unprocessed_indices:
-            print(f"All rows already processed in {os.path.basename(file_path)}.")
-            return f"{os.path.basename(file_path)}: 0 rows processed (already complete)"
-
-        selected_indices = random.sample(unprocessed_indices, min(NUM_RANDOM_ROWS, len(unprocessed_indices)))
+        selected_indices = random.sample(unprocessed_indices, min(remaining_to_fill, len(unprocessed_indices)))
+        print(f"Processing {len(selected_indices)} random rows from {os.path.basename(file_path)}...")
 
         processed = 0
+        total_rows = len(df)
         for i in selected_indices:
             prompt = df.at[i, "prompt"]
             response = df.at[i, "response"]
@@ -409,4 +416,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

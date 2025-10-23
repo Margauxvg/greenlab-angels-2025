@@ -358,17 +358,24 @@ def process_tsv(file_path):
             df["accuracy"] = [None] * len(df)
             print(f"Initialized accuracy column for {os.path.basename(file_path)}.")
 
-        # Count how many rows already have a value
         filled_count = df["accuracy"].notna().sum()
         if filled_count >= NUM_RANDOM_ROWS:
             print(f"Skipping {os.path.basename(file_path)} ({filled_count} rows already filled, >= NUM_RANDOM_ROWS).")
             return f"{os.path.basename(file_path)}: skipped ({filled_count} rows filled)"
 
-        # Determine how many more rows need to be processed
         remaining_to_fill = NUM_RANDOM_ROWS - filled_count
 
-        unprocessed_indices = df[df["accuracy"].isna()].index.tolist()
-        selected_indices = random.sample(unprocessed_indices, min(remaining_to_fill, len(unprocessed_indices)))
+        valid_unprocessed_indices = df[
+            (df["accuracy"].isna()) &
+            (df["prompt"].notna()) &
+            (df["response"].notna())
+        ].index.tolist()
+
+        selected_indices = random.sample(
+            valid_unprocessed_indices,
+            min(remaining_to_fill, len(valid_unprocessed_indices))
+        )
+
         print(f"Processing {len(selected_indices)} random rows from {os.path.basename(file_path)}...")
 
         processed = 0
@@ -376,10 +383,6 @@ def process_tsv(file_path):
         for i in selected_indices:
             prompt = df.at[i, "prompt"]
             response = df.at[i, "response"]
-
-            if pd.isna(prompt) or pd.isna(response):
-                continue
-
             test_case = LLMTestCase(input=prompt, actual_output=response)
             metric.measure(test_case)
             df.at[i, "accuracy"] = metric.score

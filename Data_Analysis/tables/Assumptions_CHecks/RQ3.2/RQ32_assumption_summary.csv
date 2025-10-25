@@ -1,0 +1,4 @@
+RQ,dv,groups,scale,shapiro_p,levene_p,ok,n_total,min_cell_n,recommendation
+RQ32,power_w_run,generation,raw,0.025572956411365113,2.2273893183260623e-12,FALSE,30,6,Use Kruskal–Wallis (nonparametric)
+RQ32,power_w_run,generation,log1p,0.022174591663802177,2.31303356198311e-12,FALSE,30,6,Use Kruskal–Wallis (nonparametric)
+RQ32,power_w_run,generation,sqrt,0.023381795010932616,2.2747086707309994e-12,FALSE,30,6,Use Kruskal–Wallis (nonparametric)

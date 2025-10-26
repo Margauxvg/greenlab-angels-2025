@@ -1,0 +1,4 @@
+RQ,dv,groups,scale,shapiro_p,levene_p,ok,n_total,min_cell_n,recommendation
+RQ2,energy_j_mean,generation * task,raw,4.261651759854514e-26,0,FALSE,900,30,Use ART (Aligned Rank Transform) for factorials (assumptions unmet)
+RQ2,energy_j_mean,generation * task,log1p,2.145047096471324e-28,0,FALSE,900,30,Use ART (Aligned Rank Transform) for factorials (assumptions unmet)
+RQ2,energy_j_mean,generation * task,sqrt,4.226123583011593e-28,0,FALSE,900,30,Use ART (Aligned Rank Transform) for factorials (assumptions unmet)

@@ -1,0 +1,4 @@
+RQ,dv,groups,scale,shapiro_p,levene_p,ok,n_total,min_cell_n,recommendation
+RQ11,energy_j_mean,generation,raw,0.9632417944210769,0.21747788376869012,TRUE,30,6,Use one-way ANOVA on raw
+RQ11,energy_j_mean,generation,log1p,0.822864767460225,0.0029090355459167336,FALSE,30,6,Use one-way ANOVA on raw
+RQ11,energy_j_mean,generation,sqrt,0.45806981366671473,0.1089434727496508,TRUE,30,6,Use one-way ANOVA on raw

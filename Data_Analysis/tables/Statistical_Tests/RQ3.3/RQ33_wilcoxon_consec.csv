@@ -1,0 +1,4 @@
+contrast,W,p_raw,cliffs_delta,p_BH,direction_note
+3 - 2,26,0.22976627046113793,-0.4444444444444444,0.29795306160816787,Cliff's delta > 0 means newer gen has higher accuracy (better)
+3.1 - 3,11,0.29795306160816787,0.3888888888888889,0.29795306160816787,Cliff's delta > 0 means newer gen has higher accuracy (better)
+3.2 - 3.1,49,0.24170641200776488,-0.3611111111111111,0.29795306160816787,Cliff's delta > 0 means newer gen has higher accuracy (better)

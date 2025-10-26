@@ -214,7 +214,7 @@ The analysis expects a CSV file named `GL_Final_Run_Table_Edited.csv` with the f
 
 ### Usage
 
-**Running the Complete Analysis
+**Running the Complete Analysis**
 
 r
 
@@ -230,8 +230,7 @@ The script will automatically:
 6. Create visualizations
 7. Export results to CSV files
 
-*### Output Structure*
-```
+Output Structure
 ├── plots/
 │   ├── Descriptive_Data_Exploration/
 │   │   ├── RQ1.1/
@@ -245,11 +244,14 @@ The script will automatically:
 │   └── Statistical_Tests/
 │       └── [same RQ structure]
 └── tables/
-    └── [same structure as plots]`
+    └── [same structure as plots]
+
+
+
 
 ### Analysis Workflow
 
-**1. Data Preprocessing
+**1. Data Preprocessing**
 
 - Aggregates repetitions into run-level statistics
 - Creates repetition-level dataset for mixed models
@@ -344,6 +346,8 @@ Tests normality and homogeneity of variance using:
 - **Planned contrasts**: Successive generations only (reduces multiple comparisons)
 - **Effect size reporting**: Mandatory for all tests
 - **Mixed models**: REML estimation with Satterthwaite degrees of freedom
+
+---
 
 This repository contains:
 - The experiment orchestration logic,

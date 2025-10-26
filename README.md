@@ -159,6 +159,191 @@ The experiment is designed to be reproducible end-to-end. High-level flow:
    - These outputs are the basis for the figures and claims in the whitepaper (e.g. "Llama 3.2 shows a large energy reduction compared to earlier generations while maintaining performance").
 
 ---
+## Data Analysis
+
+A comprehensive statistical analysis of energy consumption across Llama model generations (2, 3, 3.1, 3.2), examining the relationship between model evolution, parameter scaling, task types, and performance metrics.
+
+### Overview
+
+This repository contains R code for analyzing energy consumption patterns in Large Language Models (LLMs), specifically the Llama family. The analysis addresses six research questions examining energy efficiency improvements across generations, scaling effects, task-specific consumption, and trade-offs between energy and performance.
+
+**Research Questions**
+
+- **RQ1.1**: Energy consumption differences across Llama generations
+- **RQ1.2**: Scaling effects with parameter size within generations
+- **RQ2**: Generation × Task interaction effects on energy consumption
+- **RQ3.1**: Energy cost per output token across generations
+- **RQ3.2**: Relationship between inference duration and energy consumption
+- **RQ3.3**: Trade-offs between energy consumption and model accuracy
+
+**Requirements**
+
+**R Version
+
+- R ≥ 4.0.0
+
+**Required Packages**
+
+r
+
+`install.packages(c(
+  "tidyverse",
+  "car",
+  "ggplot2",
+  "emmeans",
+  "effectsize",
+  "lmerTest",
+  "scales",
+  "lme4"
+))`
+
+### Data Format
+
+The analysis expects a CSV file named `GL_Final_Run_Table_Edited.csv` with the following columns:
+
+- `run`: Unique run identifier
+- `repetition`: Repetition number within each run
+- `generation`: Model generation (2, 3, 3.1, 3.2)
+- `task`: Task type identifier
+- `model_size`: Parameter size (e.g., "1B", "3B", "7B", "8B")
+- `tokens`: Number of output tokens
+- `time(s)`: Inference duration in seconds
+- `energy`: Energy consumption in Joules
+- `accuracy`: Model accuracy (0-1 or 0-100)
+- `__done`: Status flag (should be "DONE" for valid entries)
+
+### Usage
+
+**Running the Complete Analysis
+
+r
+
+`source("GL_Final_Script.R")
+```
+
+The script will automatically:
+1. Create directory structure for outputs
+2. Load and preprocess data
+3. Generate descriptive statistics
+4. Verify statistical assumptions
+5. Perform appropriate statistical tests
+6. Create visualizations
+7. Export results to CSV files
+
+*### Output Structure*
+```
+├── plots/
+│   ├── Descriptive_Data_Exploration/
+│   │   ├── RQ1.1/
+│   │   ├── RQ1.2/
+│   │   ├── RQ2/
+│   │   ├── RQ3.1/
+│   │   ├── RQ3.2/
+│   │   └── RQ3.3/
+│   ├── Assumptions_Verification/
+│   │   └── [same RQ structure]
+│   └── Statistical_Tests/
+│       └── [same RQ structure]
+└── tables/
+    └── [same structure as plots]`
+
+### Analysis Workflow
+
+**1. Data Preprocessing
+
+- Aggregates repetitions into run-level statistics
+- Creates repetition-level dataset for mixed models
+- Computes derived metrics (energy per token, power, etc.)
+
+**2. Descriptive Analysis**
+
+Generates for each RQ:
+
+- Summary statistics (mean, median, SD, min, max)
+- Distribution plots (boxplots, density plots, scatter plots)
+- CSV tables with descriptive statistics
+
+**3. Assumption Verification**
+
+Tests normality and homogeneity of variance using:
+
+- Shapiro-Wilk tests for normality
+- Levene's test for homogeneity
+- Q-Q plots for visual diagnostics
+- Evaluates raw, log-transformed, and sqrt-transformed data
+- Provides test recommendations
+
+**4. Statistical Testing**
+
+**Parametric Tests** (when assumptions met):**
+
+- One-way ANOVA (RQ1.1)
+- Two-way ANOVA (RQ1.2)
+- Linear mixed-effects models (RQ2)
+
+**Nonparametric Tests** (when assumptions violated):**
+
+- Kruskal-Wallis tests (RQ3.1, RQ3.2, RQ3.3)
+- Wilcoxon rank-sum tests for post-hoc comparisons
+
+**Effect Sizes**:
+
+- η² and ω² for ANOVA
+- Hedges' g for pairwise comparisons
+- ε² for Kruskal-Wallis
+- Cliff's delta for Wilcoxon tests
+
+**Multiple Comparison Correction**:
+
+- Benjamini-Hochberg (BH) adjustment for all post-hoc tests
+
+### Key Features
+
+**Robust Statistical Approach**
+
+- Automatic assumption checking with transformation suggestions
+- Appropriate test selection based on data characteristics
+- Planned contrasts (successive generations: 2→3, 3→3.1, 3.1→3.2)
+- Polynomial trend analysis for ordered factors
+
+**Mixed-Effects Modeling (RQ2)**
+
+- Accounts for nested structure (repetitions within runs)
+- Tests generation × task interaction
+- Provides estimates on both link and response scales
+- Includes ICC and convergence diagnostics
+
+**Comprehensive Outputs**
+
+- Publication-ready plots (PNG, 150-300 DPI)
+- Detailed CSV tables for all analyses
+- Console summaries with key findings
+- Effect sizes for all significant results
+
+### Interpreting Results
+
+**Tables**
+
+- `_desc.csv`: Descriptive statistics
+- `_assumption_summary.csv`: Assumption test results and recommendations
+- `_omnibus.csv`: Main effect tests
+- `_consec.csv` / `_pairwise.csv`: Post-hoc comparisons with BH-adjusted p-values
+
+**Plots**
+
+- **Boxplots**: Distribution and outliers by group
+- **Density plots**: Overlapping distributions
+- **Scatter plots**: Relationships between continuous variables
+- **ECDF plots**: Full distribution comparisons
+- **Q-Q plots**: Normality diagnostics
+
+### Statistical Decisions
+
+- **Significance level**: α = 0.05
+- **Two-sided tests** throughout
+- **Planned contrasts**: Successive generations only (reduces multiple comparisons)
+- **Effect size reporting**: Mandatory for all tests
+- **Mixed models**: REML estimation with Satterthwaite degrees of freedom
 
 This repository contains:
 - The experiment orchestration logic,

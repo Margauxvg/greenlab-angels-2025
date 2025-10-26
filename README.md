@@ -178,7 +178,7 @@ This repository contains R code for analyzing energy consumption patterns in Lar
 
 **Requirements**
 
-**R Version
+**R Version**
 
 - R ≥ 4.0.0
 
@@ -217,9 +217,9 @@ The analysis expects a CSV file named `GL_Final_Run_Table_Edited.csv` with the f
 **Running the Complete Analysis**
 
 r
-
-`source("GL_Final_Script.R")
 ```
+`source("GL_Final_Script.R")
+
 
 The script will automatically:
 1. Create directory structure for outputs
@@ -245,8 +245,7 @@ Output Structure
 │       └── [same RQ structure]
 └── tables/
     └── [same structure as plots]
-
-
+```
 
 
 ### Analysis Workflow

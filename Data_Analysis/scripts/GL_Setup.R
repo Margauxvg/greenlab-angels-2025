@@ -47,21 +47,23 @@ df <- runs %>%
   )
 
 # ---- Build run-level table (one row per run) ----
-run_level <- df %>%
-  group_by(run, generation, task, model_size_label, model_size_b) %>%
-  summarise(
-    n_reps            = n(),
-    energy_j_mean     = mean(energy_j, na.rm = TRUE),
-    energy_j_sd       = sd(energy_j,   na.rm = TRUE),
-    duration_s_mean   = mean(duration_s, na.rm = TRUE),
-    tokens_mean       = mean(tokens,   na.rm = TRUE),
-    e_per_tok_mean    = mean(energy_per_token, na.rm = TRUE),
-    accuracy_mean     = mean(accuracy, na.rm = TRUE),
-    accuracy_sd       = sd(accuracy,   na.rm = TRUE),
-    .groups = "drop"
-  ) %>%
+repetition_level <- df %>%
   mutate(
-    logE = log1p(energy_j_mean)
+    generation = factor(generation, levels = c("2","3","3.1","3.2"), ordered = TRUE)
+  ) %>%
+  transmute(
+    # Keys
+    run, repetition, generation, task, model_size_label, model_size_b,
+    
+    # Raw metrics (Critical for RQ3.2 script)
+    energy_j          = energy_j,
+    duration_s        = duration_s,
+    energy_per_token  = energy_per_token,
+    accuracy          = accuracy,
+    tokens            = tokens,
+    
+    # Derived
+    logE              = log1p(energy_j)
   )
 
 # ---- Build repetition-level table (one row per repetition) ----

@@ -1459,7 +1459,7 @@ readr::write_csv(spearman_by_gen, "tables/Statistical_Tests/RQ3.2/RQ32_spearman_
 
 # ---------- 5) Plots ----------
 # 5a) Box + jitter of average power by generation
-p_box <- ggplot(rq32, aes(generation, power_w_run, fill = generation)) +
+p_box <- ggplot(rq32, aes(generation, power_w, fill = generation)) +
   geom_boxplot(outlier.alpha = 0.25, width = 0.65) +
   geom_jitter(width = 0.08, height = 0, alpha = 0.55, size = 1) +
   labs(x = "Generation", y = "Average power per run (W)", fill = "Generation") +
@@ -1468,7 +1468,7 @@ ggsave("plots/Statistical_Tests/RQ3.2/RQ32_box_power_by_generation.png", p_box,
        width = 8, height = 5, dpi = 150, bg = "white")
 
 # 5b) Scatter: duration vs energy, colored by generation
-p_scatter <- ggplot(rq32, aes(duration_s_mean, energy_j_mean, color = generation)) +
+p_scatter <- ggplot(rq32, aes(duration_s, energy_j, color = generation)) +
   geom_point(alpha = 0.8, size = 2) +
   labs(x = "Inference duration (s)", y = "Energy per run (J)", color = "Generation") +
   theme_minimal()

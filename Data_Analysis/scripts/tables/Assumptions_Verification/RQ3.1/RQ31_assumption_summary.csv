@@ -1,0 +1,4 @@
+RQ,dv,groups,scale,shapiro_p,levene_p,ok,n_total,min_cell_n,recommendation
+RQ31,e_per_tok_mean,generation,raw,1.360141425992717e-4,7.551977488796834e-35,FALSE,30,6,Use Kruskal–Wallis (nonparametric)
+RQ31,e_per_tok_mean,generation,log1p,7.199006781941834e-5,3.0833643907303786e-43,FALSE,30,6,Use Kruskal–Wallis (nonparametric)
+RQ31,e_per_tok_mean,generation,sqrt,8.524983479609859e-5,1.5169392253208171e-40,FALSE,30,6,Use Kruskal–Wallis (nonparametric)

@@ -1,0 +1,4 @@
+Term,F,Df,Df.res,Pr(>F)
+generation,30.994,3,6,0
+task,2.236,5,6,0.178
+generation:task,0.691,15,6,0.738

@@ -1,0 +1,5 @@
+generation,n_observations,mean_accuracy,median_accuracy,sd_accuracy,rho_energy_acc
+2,180,0.968,1,0.045,0.121
+3,180,0.94,0.955,0.057,-0.044
+3.1,180,0.956,1,0.068,0.404
+3.2,360,0.93,0.967,0.091,0.331

@@ -1,0 +1,2 @@
+RQ,dv,groups,scale,shapiro_p,levene_p,ok,n_total,recommendation
+RQ1.1,energy_j_mean,generation,raw,0.963,0.217,TRUE,30,Use one-way ANOVA (Parametric)

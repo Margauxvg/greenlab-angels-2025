@@ -1,0 +1,7 @@
+Comparison,estimate,SE,df,t.ratio,p.value
+generation2 - generation3,229.989,39.553,26,5.815,0
+generation2 - generation3.1,212.122,39.553,26,5.363,0
+generation2 - generation3.2,596.986,34.254,26,17.428,0
+generation3 - generation3.1,-17.867,39.553,26,-0.452,0.655
+generation3 - generation3.2,366.997,34.254,26,10.714,0
+generation3.1 - generation3.2,384.864,34.254,26,11.236,0

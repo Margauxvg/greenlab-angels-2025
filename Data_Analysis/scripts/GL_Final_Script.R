@@ -444,98 +444,80 @@ if (is.na(acc_col)) {
 #NORMALITY AND ASSUMPTIONS VERIFICATION
 #___________________________________________
 
-
-
-# UNIVERSAL ASSUMPTION CHECKER
-# Writes one CSV per RQ with rows for raw/log1p/sqrt.
-
-
-#Generic checker function
 check_assumptions <- function(data, dv, groups, label = "RQ", outdir = "plots/Assumptions_Verification") {
   stopifnot(dv %in% names(data))
   stopifnot(all(groups %in% names(data)))
   if (!dir.exists(outdir)) dir.create(outdir, recursive = TRUE)
   
-  # subset, drop NAs, coerce groups to factors
+  # Subset and clean
   df <- data %>% select(all_of(c(groups, dv))) %>% drop_na()
   for (g in groups) df[[g]] <- factor(df[[g]])
   names(df)[names(df) == dv] <- "y"
-  
-  # create a cell factor for Levene across all combinations
   df$cell <- interaction(df[groups], drop = TRUE)
   
-  # build the model formula y ~ g1 * g2 * ...
+  # Build formula
   rhs <- paste(groups, collapse = " * ")
   fm  <- as.formula(paste("y ~", rhs))
   
-  run_one <- function(y_vec, scale_label) {
-    tmp <- df; tmp$y <- y_vec
-    fit <- lm(fm, data = tmp)
-    res <- resid(fit)
-    
-    p_sh <- if (length(res) >= 3 && length(res) <= 5000)
-      suppressWarnings(shapiro.test(res)$p.value) else NA_real_
-    p_lv <- tryCatch(car::leveneTest(y ~ cell, data = tmp)[["Pr(>F)"]][1],
-                     error = function(e) NA_real_)
-    
-    # Save Q–Q plot
-    qq <- ggplot(data.frame(res = res), aes(sample = res)) +
-      stat_qq() + stat_qq_line() +
-      labs(title = paste0(label, " Q–Q: ", dv, " (", scale_label, ")"),
-           x = "Theoretical", y = "Residuals") +
-      theme_minimal()
-    ggsave(file.path(outdir, paste0(label, "_QQ_", dv, "_", scale_label, ".png")),
-           qq, width = 5, height = 4, dpi = 150, bg = "white")
-    
-    tibble(scale = scale_label, shapiro_p = p_sh, levene_p = p_lv)
-  }
+  # 1. Run Assessment on RAW scale only
+  fit <- lm(fm, data = df)
+  res <- resid(fit)
   
-  # RAW
-  out <- run_one(df$y, "raw")
-  # LOG1P and SQRT for nonnegative DVs
-  if (all(df$y >= 0, na.rm = TRUE)) {
-    out <- bind_rows(out, run_one(log1p(df$y), "log1p"))
-    out <- bind_rows(out, run_one(sqrt(df$y),  "sqrt"))
-  }
+  p_sh <- if (length(res) >= 3 && length(res) <= 5000)
+    suppressWarnings(shapiro.test(res)$p.value) else NA_real_
+  p_lv <- tryCatch(car::leveneTest(y ~ cell, data = df)[["Pr(>F)"]][1],
+                   error = function(e) NA_real_)
   
-  out <- out %>% mutate(ok = shapiro_p >= 0.05 & levene_p >= 0.05)
+  # Save Q–Q plot
+  qq <- ggplot(data.frame(res = res), aes(sample = res)) +
+    stat_qq() + stat_qq_line() +
+    labs(title = paste0(label, " Q–Q (Raw Scale)"), x = "Theoretical", y = "Residuals") +
+    theme_minimal()
+  ggsave(file.path(outdir, paste0(label, "_QQ_raw.png")), qq, width = 5, height = 4, dpi = 150, bg = "white")
   
-  # Recommendation logic (one-way vs factorial)
-  pick <- function(sc) out %>% filter(scale == sc) %>% slice(1)
+  # 2. Dynamic Recommendation Logic
   ng <- length(groups)
+  is_norm <- !is.na(p_sh) && p_sh >= 0.05
+  is_homo <- !is.na(p_lv) && p_lv >= 0.05
   
   rec <- if (ng == 1) {
-    if (isTRUE(pick("raw")$ok))        "Use one-way ANOVA on raw"
-    else if (isTRUE(pick("log1p")$ok)) "Use one-way ANOVA on log1p"
-    else if (isTRUE(pick("sqrt")$ok))  "Use one-way ANOVA on sqrt"
-    else if (!is.na(pick("raw")$shapiro_p) && pick("raw")$shapiro_p >= 0.05 &&
-             !is.na(pick("raw")$levene_p)  && pick("raw")$levene_p  <  0.05)
-      "Use Welch one-way ANOVA on raw (unequal variances)"
-    else if (!is.na(pick("log1p")$shapiro_p) && pick("log1p")$shapiro_p >= 0.05 &&
-             !is.na(pick("log1p")$levene_p)  && pick("log1p")$levene_p  <  0.05)
-      "Use Welch one-way ANOVA on log1p (unequal variances)"
-    else "Use Kruskal–Wallis (nonparametric)"
+    if (is_norm && is_homo) {
+      "Use one-way ANOVA (Parametric)"
+    } else if (is_norm && !is_homo) {
+      "Use Welch one-way ANOVA (Unequal variances)"
+    } else {
+      # This addresses your specific feedback: If not normal, go non-parametric
+      "Use Kruskal-Wallis (Non-parametric)"
+    }
   } else {
-    if (isTRUE(pick("raw")$ok))        paste0("Use factorial ANOVA on raw: ", deparse(fm))
-    else if (isTRUE(pick("log1p")$ok)) paste0("Use factorial ANOVA on log1p: ", deparse(fm))
-    else if (isTRUE(pick("sqrt")$ok))  paste0("Use factorial ANOVA on sqrt: ", deparse(fm))
-    else "Use ART (Aligned Rank Transform) for factorials (assumptions unmet)"
+    # For Factorial designs
+    if (is_norm && is_homo) {
+      paste0("Use factorial ANOVA on raw: ", deparse(fm))
+    } else {
+      "Use ART (Aligned Rank Transform) for factorials (Assumptions unmet)"
+    }
   }
   
+  # Return summary
+  out <- tibble(scale = "raw", shapiro_p = p_sh, levene_p = p_lv, ok = (is_norm && is_homo))
   list(summary = out, recommendation = rec)
 }
 
-#Helper to write CSV per RQ
-if (!dir.exists("tables")) dir.create("tables", recursive = TRUE)
-
 save_assessment <- function(label, res, dv, groups, data, outdir = "tables") {
-  df <- data %>% select(all_of(c(groups, dv))) %>% drop_na()
-  n_total <- nrow(df)
-  cell_counts <- df %>%
+  # Ensure the directory exists (added a recursive check here just in case)
+  if (!dir.exists(outdir)) dir.create(outdir, recursive = TRUE)
+
+  # Prepare the data metadata
+  df_clean <- data %>% select(all_of(c(groups, dv))) %>% drop_na()
+  n_total <- nrow(df_clean)
+  
+  cell_counts <- df_clean %>%
     mutate(across(all_of(groups), as.factor)) %>%
     count(across(all_of(groups)), name = "n")
+  
   min_cell_n <- if (nrow(cell_counts)) min(cell_counts$n) else NA_integer_
   
+  # Join the metadata with the results from check_assumptions
   out <- res$summary %>%
     mutate(
       RQ = label,
@@ -545,25 +527,138 @@ save_assessment <- function(label, res, dv, groups, data, outdir = "tables") {
       min_cell_n = min_cell_n,
       recommendation = res$recommendation
     ) %>%
+    # We keep 'scale' even if it's always 'raw' to maintain your table structure
     select(RQ, dv, groups, scale, shapiro_p, levene_p, ok, n_total, min_cell_n, recommendation)
   
-  readr::write_csv(out, file.path(outdir, paste0(label, "_assumption_summary.csv")))
-  cat(sprintf("%s: wrote %s/%s_assumption_summary.csv\n", label, outdir, label))
+  # Write the file
+  file_path <- file.path(outdir, paste0(label, "_assumption_summary.csv"))
+  readr::write_csv(out, file_path)
+  
+  cat(sprintf("%s: Summary saved to %s\n", label, file_path))
 }
+
+# # UNIVERSAL ASSUMPTION CHECKER
+# # Writes one CSV per RQ with rows for raw/log1p/sqrt.
+
+
+# #Generic checker function
+# check_assumptions <- function(data, dv, groups, label = "RQ", outdir = "plots/Assumptions_Verification") {
+#   stopifnot(dv %in% names(data))
+#   stopifnot(all(groups %in% names(data)))
+#   if (!dir.exists(outdir)) dir.create(outdir, recursive = TRUE)
+  
+#   # subset, drop NAs, coerce groups to factors
+#   df <- data %>% select(all_of(c(groups, dv))) %>% drop_na()
+#   for (g in groups) df[[g]] <- factor(df[[g]])
+#   names(df)[names(df) == dv] <- "y"
+  
+#   # create a cell factor for Levene across all combinations
+#   df$cell <- interaction(df[groups], drop = TRUE)
+  
+#   # build the model formula y ~ g1 * g2 * ...
+#   rhs <- paste(groups, collapse = " * ")
+#   fm  <- as.formula(paste("y ~", rhs))
+  
+#   run_one <- function(y_vec, scale_label) {
+#     tmp <- df; tmp$y <- y_vec
+#     fit <- lm(fm, data = tmp)
+#     res <- resid(fit)
+    
+#     p_sh <- if (length(res) >= 3 && length(res) <= 5000)
+#       suppressWarnings(shapiro.test(res)$p.value) else NA_real_
+#     p_lv <- tryCatch(car::leveneTest(y ~ cell, data = tmp)[["Pr(>F)"]][1],
+#                      error = function(e) NA_real_)
+    
+#     # Save Q–Q plot
+#     qq <- ggplot(data.frame(res = res), aes(sample = res)) +
+#       stat_qq() + stat_qq_line() +
+#       labs(title = paste0(label, " Q–Q: ", dv, " (", scale_label, ")"),
+#            x = "Theoretical", y = "Residuals") +
+#       theme_minimal()
+#     ggsave(file.path(outdir, paste0(label, "_QQ_", dv, "_", scale_label, ".png")),
+#            qq, width = 5, height = 4, dpi = 150, bg = "white")
+    
+#     tibble(scale = scale_label, shapiro_p = p_sh, levene_p = p_lv)
+#   }
+  
+#   # RAW
+#   out <- run_one(df$y, "raw")
+#   # LOG1P and SQRT for nonnegative DVs
+#   if (all(df$y >= 0, na.rm = TRUE)) {
+#     out <- bind_rows(out, run_one(log1p(df$y), "log1p"))
+#     out <- bind_rows(out, run_one(sqrt(df$y),  "sqrt"))
+#   }
+  
+#   out <- out %>% mutate(ok = shapiro_p >= 0.05 & levene_p >= 0.05)
+  
+#   # Recommendation logic (one-way vs factorial)
+#   pick <- function(sc) out %>% filter(scale == sc) %>% slice(1)
+#   ng <- length(groups)
+  
+#   rec <- if (ng == 1) {
+#     if (isTRUE(pick("raw")$ok))        "Use one-way ANOVA on raw"
+#     else if (isTRUE(pick("log1p")$ok)) "Use one-way ANOVA on log1p"
+#     else if (isTRUE(pick("sqrt")$ok))  "Use one-way ANOVA on sqrt"
+#     else if (!is.na(pick("raw")$shapiro_p) && pick("raw")$shapiro_p >= 0.05 &&
+#              !is.na(pick("raw")$levene_p)  && pick("raw")$levene_p  <  0.05)
+#       "Use Welch one-way ANOVA on raw (unequal variances)"
+#     else if (!is.na(pick("log1p")$shapiro_p) && pick("log1p")$shapiro_p >= 0.05 &&
+#              !is.na(pick("log1p")$levene_p)  && pick("log1p")$levene_p  <  0.05)
+#       "Use Welch one-way ANOVA on log1p (unequal variances)"
+#     else "Use Kruskal–Wallis (nonparametric)"
+#   } else {
+#     if (isTRUE(pick("raw")$ok))        paste0("Use factorial ANOVA on raw: ", deparse(fm))
+#     else if (isTRUE(pick("log1p")$ok)) paste0("Use factorial ANOVA on log1p: ", deparse(fm))
+#     else if (isTRUE(pick("sqrt")$ok))  paste0("Use factorial ANOVA on sqrt: ", deparse(fm))
+#     else "Use ART (Aligned Rank Transform) for factorials (assumptions unmet)"
+#   }
+  
+#   list(summary = out, recommendation = rec)
+# }
+
+#Helper to write CSV per RQ
+# if (!dir.exists("tables")) dir.create("tables", recursive = TRUE)
+
+# save_assessment <- function(label, res, dv, groups, data, outdir = "tables") {
+#   df <- data %>% select(all_of(c(groups, dv))) %>% drop_na()
+#   n_total <- nrow(df)
+#   cell_counts <- df %>%
+#     mutate(across(all_of(groups), as.factor)) %>%
+#     count(across(all_of(groups)), name = "n")
+#   min_cell_n <- if (nrow(cell_counts)) min(cell_counts$n) else NA_integer_
+  
+#   out <- res$summary %>%
+#     mutate(
+#       RQ = label,
+#       dv = dv,
+#       groups = paste(groups, collapse = " * "),
+#       n_total = n_total,
+#       min_cell_n = min_cell_n,
+#       recommendation = res$recommendation
+#     ) %>%
+#     select(RQ, dv, groups, scale, shapiro_p, levene_p, ok, n_total, min_cell_n, recommendation)
+  
+#   readr::write_csv(out, file.path(outdir, paste0(label, "_assumption_summary.csv")))
+#   cat(sprintf("%s: wrote %s/%s_assumption_summary.csv\n", label, outdir, label))
+# }
 
 # RQ-SPECIFIC CALLS
 
-# ---------- RQ 1.1 ----------
-res_RQ11 <- check_assumptions(
-  data   = run_level,
-  dv     = "energy_j_mean",
-  groups = c("generation"),
-  label  = "RQ11",
-  outdir = "plots/Assumptions_Verification/RQ1.1"
-)
-cat("RQ11:", res_RQ11$recommendation, "\n")
-save_assessment("RQ11", res_RQ11, "energy_j_mean", c("generation"), run_level, 
-                outdir = "tables/Assumptions_Verification/RQ1.1")
+# # ---------- RQ 1.1 ----------
+# res_RQ11 <- check_assumptions(
+#   data   = run_level,
+#   dv     = "energy_j_mean",
+#   groups = c("generation"),
+#   label  = "RQ11",
+#   outdir = "plots/Assumptions_Verification/RQ1.1"
+# )
+# cat("RQ11:", res_RQ11$recommendation, "\n")
+# save_assessment("RQ11", res_RQ11, "energy_j_mean", c("generation"), run_level, 
+#                 outdir = "tables/Assumptions_Verification/RQ1.1")
+
+# ---------- RQ 1.1 Assumption Call ----------
+res_RQ11 <- check_assumptions(run_level, "energy_j_mean", "generation", "RQ11", "plots/Assumptions_Verification/RQ1.1")
+save_assessment("RQ11", res_RQ11, "energy_j_mean", "generation", run_level, "tables/Assumptions_Verification/RQ1.1")
 
 # ---------- RQ 1.2 ----------
 res_RQ12 <- check_assumptions(

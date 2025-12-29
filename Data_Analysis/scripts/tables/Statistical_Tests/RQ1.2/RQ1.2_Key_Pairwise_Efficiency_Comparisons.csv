@@ -1,0 +1,4 @@
+Comparison,Z,P.unadj,P.adj
+Gen3.2_1B - Gen3.2_3B,1.213,0.225,0.321
+Gen2_7B - Gen3_8B,1.148,0.251,0.314
+Gen3.1_8B - Gen3_8B,-0.328,0.743,0.743

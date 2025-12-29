@@ -1,4 +1,0 @@
-RQ,dv,groups,scale,shapiro_p,levene_p,ok,n_total,min_cell_n,recommendation
-RQ33,accuracy_mean,generation,raw,0.04294565613170912,0.33075974742331204,FALSE,30,6,Use Kruskal–Wallis (nonparametric)
-RQ33,accuracy_mean,generation,log1p,0.0380941144694716,0.32686960877137,FALSE,30,6,Use Kruskal–Wallis (nonparametric)
-RQ33,accuracy_mean,generation,sqrt,0.03786405502084081,0.3267986167937919,FALSE,30,6,Use Kruskal–Wallis (nonparametric)

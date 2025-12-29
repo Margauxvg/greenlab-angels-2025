@@ -1,0 +1,2 @@
+test,chi_sq,df,p_value,epsilon_sq,note
+Kruskal-Wallis,12.908,4,0.012,0.445,Grouped by Gen and Size to handle unbalanced design

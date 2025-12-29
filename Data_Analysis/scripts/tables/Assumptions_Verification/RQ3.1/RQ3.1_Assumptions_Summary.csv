@@ -1,0 +1,2 @@
+RQ,dv,groups,scale,shapiro_p,levene_p,ok,n_total,recommendation
+RQ3.1,e_per_tok_mean,generation,raw,0,0,FALSE,30,Use Kruskal-Wallis (Non-parametric)

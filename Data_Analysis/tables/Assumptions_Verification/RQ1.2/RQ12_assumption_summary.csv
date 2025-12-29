@@ -1,4 +1,0 @@
-RQ,dv,groups,scale,shapiro_p,levene_p,ok,n_total,min_cell_n,recommendation
-RQ12,J_per_B,generation * model_size_b,raw,0.6797275522182398,0.3329416847630286,TRUE,30,6,Use factorial ANOVA on raw: y ~ generation * model_size_b
-RQ12,J_per_B,generation * model_size_b,log1p,0.30285301936643405,0.3814661326813707,TRUE,30,6,Use factorial ANOVA on raw: y ~ generation * model_size_b
-RQ12,J_per_B,generation * model_size_b,sqrt,0.5322349056822798,0.4107902845225249,TRUE,30,6,Use factorial ANOVA on raw: y ~ generation * model_size_b

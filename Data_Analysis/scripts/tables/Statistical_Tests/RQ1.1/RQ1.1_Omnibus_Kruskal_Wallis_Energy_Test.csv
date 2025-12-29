@@ -1,0 +1,2 @@
+test,df,chi_sq,p_value,epsilon_sq,interpretation
+Kruskal-Wallis,3,21.265,0,0.733,Non-parametric comparison of medians

@@ -1,0 +1,4 @@
+Comparison,W_stat,p_raw,cliffs_delta,magnitude,p_BH
+2 to 3,0,0.005,1,large,0.008
+3 to 3.1,7,0.093,0.611,large,0.093
+3.1 to 3.2,72,0.001,-1,large,0.003

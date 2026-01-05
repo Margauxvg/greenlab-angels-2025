@@ -1,2 +1,0 @@
-RQ,dv,groups,scale,shapiro_p,levene_p,ok,n_total,recommendation
-RQ3.3,accuracy_val,generation,raw,0,0,FALSE,900,Use Kruskal-Wallis (Non-parametric)

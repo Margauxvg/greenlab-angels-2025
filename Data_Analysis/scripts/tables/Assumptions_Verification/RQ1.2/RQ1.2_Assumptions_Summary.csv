@@ -1,2 +1,0 @@
-RQ,dv,groups,scale,shapiro_p,levene_p,ok,n_total,recommendation
-RQ1.2,J_per_B,generation * model_size_b,raw,0.68,0.333,TRUE,30,Use factorial ANOVA

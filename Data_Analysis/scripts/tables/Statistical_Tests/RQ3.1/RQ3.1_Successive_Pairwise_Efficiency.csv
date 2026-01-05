@@ -1,0 +1,4 @@
+Comparison,estimate,SE,df,t.ratio,p.value,Analysis_Level
+generation2 - generation3,-238.044,42.632,26,-5.584,0,Efficiency Evolution
+generation3 - generation3.1,-63.911,42.632,26,-1.499,0.146,Efficiency Evolution
+generation3.1 - generation3.2,571.956,36.921,26,15.492,0,Efficiency Evolution

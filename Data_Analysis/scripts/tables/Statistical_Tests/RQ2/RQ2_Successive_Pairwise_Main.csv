@@ -1,0 +1,4 @@
+Comparison,estimate,SE,df,t.ratio,p.value,Analysis_Level
+generation2 - generation3,180,81.367,6,2.212,0.069,Main Effect (Across Tasks)
+generation3 - generation3.1,180,81.367,6,2.212,0.069,Main Effect (Across Tasks)
+generation3.1 - generation3.2,270,70.466,6,3.832,0.013,Main Effect (Across Tasks)

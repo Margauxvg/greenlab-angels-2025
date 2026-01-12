@@ -43,7 +43,7 @@ df <- runs %>%
     repetition = as.integer(repetition),
     generation = factor(generation, levels = c("2","3","3.1","3.2"), ordered = TRUE),
     task = factor(task),
-    model_size_label = factor(trimws(model_size), levels = c("1B","3B","7B","8B"), ordered = TRUE),
+    model_size_label = factor(model_size, levels = c("1B","3B","7B","8B")),
     model_size_b = readr::parse_number(model_size),
     tokens = as.integer(tokens),
     duration_s = as.numeric(duration_s),
@@ -179,6 +179,7 @@ save_rq_table(rq12_desc, "Descriptive_Data_Exploration", "RQ1.2", "Descriptive_S
 # 2. Plots
 p_rq12_box <- ggplot(run_level, aes(generation, J_per_B, fill = model_size_label)) +
   geom_boxplot(outlier.alpha = 0.35) +
+  scale_fill_discrete(limits = c("1B", "3B", "7B", "8B")) +
   stat_summary(fun = median, geom = "line", aes(group = 1), linetype = "dotted", color = "black") +
   stat_summary(fun = mean, geom = "point", shape = 18, size = 4, 
                position = position_dodge(width = 0.75), color = "darkred") +
